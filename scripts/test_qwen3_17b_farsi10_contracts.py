@@ -96,11 +96,25 @@ class Qwen17InferenceContracts(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             with mock.patch.object(s, "verify_context", return_value=None):
                 with mock.patch.object(s, "download_one", side_effect=AssertionError("NETWORK")) as f:
-                    root=pathlib.Path(tmp)
-                    wrong=root/"bad.json"
+                    base=pathlib.Path(tmp)
+                    root=base/"empty_model"
+                    root.mkdir()
+                    wrong=base/"bad.json"
                     wrong.write_text("{}",encoding="utf-8")
                     with self.assertRaises((ValueError, KeyError)):
                         s.stage(root,wrong,LOCK)
+                f.assert_not_called()
+
+    def test_13b_nonempty_model_dir_fails_closed_before_download(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=pathlib.Path(tmp)/"model"
+            root.mkdir()
+            (root/"stray.txt").write_text("synthetic",encoding="utf-8")
+            with mock.patch.object(s, "verify_context", return_value=None):
+                with mock.patch.object(s, "download_one",
+                                       side_effect=AssertionError("NETWORK")) as f:
+                    with self.assertRaisesRegex(RuntimeError, "UNSAFE_MODEL_DIR"):
+                        s.stage(root,MANIFEST,LOCK)
                 f.assert_not_called()
 
     def test_14_all_eleven_mocked_downloads_only(self):
