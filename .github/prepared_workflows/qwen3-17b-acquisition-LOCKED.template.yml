@@ -1,0 +1,59 @@
+# PREPARED ONLY / NOT AN ACTIVE GITHUB ACTIONS WORKFLOW.
+# This file intentionally lives outside .github/workflows.
+# Do not activate without independent verification of signed owner authorization.
+# The referenced Python downloader is also hard-locked in its committed source.
+name: Prepared LOCKED Qwen3-1.7B Acquisition Hash Only
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen3-17b-one-shot-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquisition_only:
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout public allowlisted code, no persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Prove metadata and download code contracts before network use
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_metadata_gate.py' -v
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_acquisition_LOCKED.py' -v
+          # The locked test must be reviewed/reworked after formal, private
+          # approval; until then keep the whole template INACTIVE.
+
+      - name: Download only if an independent signed owner gate has been verified and unlocked
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Intentionally no workflow input for unsigned owner consent.
+          # Current Python source always fails closed before any download.
+          python3 -B scripts/qwen3_17b_acquisition_PREPARED_LOCKED.py \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --receipt qwen3_17b_acquisition_sha_only_receipt.json
+
+      - name: Upload ONLY tiny public SHA receipt, NEVER model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen3-17b-public-sha-only-receipt
+          path: qwen3_17b_acquisition_sha_only_receipt.json
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 6
