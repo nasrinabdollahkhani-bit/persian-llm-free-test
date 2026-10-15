@@ -27,12 +27,16 @@ The personal-project owner agreed to **planning and preparation** of `Qwen/Qwen3
 - [Inert workflow template](.github/prepared_workflows/qwen3-17b-acquisition-LOCKED.template.yml) — deliberately **OUTSIDE** `.github/workflows/` and cannot be selected as an active GitHub Actions workflow.
 - [Personal-owner chat consent instructions](docs/QWEN3_17B_NEW_OWNER_ACQUISITION_AUTHORIZATION_TEMPLATE_FA.md) — a clear, scoped reply in this conversation is sufficient for personal public-model download approval; **no paper signature or organizational signoff is required**.
 
-### Next actual owner gate
+### Current gate — explicit owner approval granted for ONE download, not inference
 
-The personal-project owner must explicitly consent **in this chat** to exactly one public GitHub-hosted standard CPU runner job acquiring only the pinned 11 files, checking hashes, deleting all model bytes after the job, publishing only a public SHA receipt, with **NO inference** and no spending. This is **not** an organizational approval process.
+On **2026-10-15**, the personal-project owner said **«اجازه دانلود می‌دهم»**, in response to the narrowly specified request for one public GitHub Actions free CPU acquisition of exactly 11 pinned Qwen3-1.7B files, SHA-256 validation, temporary cleanup and a public SHA-only receipt. **This is not permission to execute the model or publish weights.** Paper-signature/organizational approval is unnecessary for this personal and entirely public/synthetic trial.
 
-Only after the owner's explicit chat approval and independent code review may a reviewed source change unlock the downloader and turn the inert template into a **manually invoked** workflow. Do not add public `workflow_dispatch` consent inputs and do not weaken the model or host guards.
+- [Owner-authorized ONE-SHOT download Workflow](.github/workflows/qwen3-17b-one-shot-acquisition.yml) — **manual dispatch only**, only run **#1** attempt **#1**, actor/repo/branch and job guarded in both YAML and Python.
+- [Active one-shot acquisition wrapper](scripts/qwen3_17b_acquisition_ONE_SHOT.py) — reuses the pinned 11-file SHA checking routine from the still-locked previous candidate, calls temporary cleanup, reports only hashes.
+- [14 no-network one-shot tests](scripts/test_qwen3_17b_one_shot.py), 11 metadata tests and 10 previous locked-script tests are scheduled **BEFORE downloads**. Count: 35 tests, not claimed CI-PASS until the first actual run.
+- Existing [locked acquisition baseline](scripts/qwen3_17b_acquisition_PREPARED_LOCKED.py) and [inert workflow template](.github/prepared_workflows/qwen3-17b-acquisition-LOCKED.template.yml) remain inactive for historical comparison.
+- The only Artifact paths are small **JSON SHA receipts**, never the model files, tensors, tokenizers, personal data, or inference output. Temp weights are cleaned on normal exit; GitHub's ephemeral runner terminates after the job. No paid runner, no installs, no GPUs, no organization data.
 
-**Model inference requires a second, separate explicit owner chat approval after actual acquisition checksum verification.** Neither a chat agreement to prepare nor metadata-capacity PASS is an execution license. No TAMIN/APEX connection, organizational dataset, Windows acceptance or product freeze follows.
+**Only user action pending:** open [the one-shot manual workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-one-shot-acquisition.yml), select `main`, press **Run workflow ONCE**, and share its run URL. Do not retry even if it fails; investigate the failure and request new scope/approval before another attempt.
 
-This repository intentionally cannot automatically start the Qwen3-1.7B acquisition at its current locked state.
+After the actual 11-file acquisition is independently confirmed, the owner may separately approve one **synthetic Persian quality inference experiment**. Until then: Qwen3-1.7B `INFERENCE_NOT_AUTHORIZED`, `APEX_NO_INTEGRATION`, `PRODUCTION_NO_ACCEPTANCE`.
