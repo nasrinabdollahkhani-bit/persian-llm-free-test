@@ -198,7 +198,7 @@ jobs:
             preflight.json
             runtime_versions.txt
             five_response_model_stage_receipt.json
-            synthetic_persian_responses.json
+            farsi_quality_v2_responses.json
           if-no-files-found: warn
           retention-days: 1
           compression-level: 6
