@@ -41,6 +41,17 @@ jobs:
           set -euo pipefail
           python3 -B scripts/runner_preflight.py
 
+      - name: Fail early if kernel outbound controls are unavailable
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v sudo
+          command -v iptables
+          command -v ip6tables
+          sudo iptables -L OUTPUT >/dev/null
+          sudo ip6tables -L OUTPUT >/dev/null
+          echo "NETWORK_GUARD_PREREQUISITES_PRESENT"
+
       - name: Install version-pinned CPU runtime (no CUDA)
         shell: bash
         run: |
