@@ -22,7 +22,9 @@ def verify_context():
     }
     if any(os.environ.get(k) != v for k,v in expected_env.items()):
         raise RuntimeError("ONE_SHOT_CONTEXT_DENIED")
-\n\ndef validate_hash_lock(manifest, lock):
+
+
+def validate_hash_lock(manifest, lock):
     validate_manifest(manifest)
     if lock["source_run_id"] != "38734778931" or lock["fixed_revision"] != "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e":
         raise RuntimeError("PRIOR_RECEIPT_IDENTITY_MISMATCH")
