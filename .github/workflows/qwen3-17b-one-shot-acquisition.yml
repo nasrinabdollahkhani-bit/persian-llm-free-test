@@ -1,0 +1,76 @@
+name: Owner Authorized Qwen3-1.7B ONE-SHOT Acquisition ONLY (NO INFERENCE)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen3-17b-owner-one-shot-acquisition
+  cancel-in-progress: false
+
+jobs:
+  acquire_only:
+    name: One-time public pinned model download, 11 SHA receipts, cleanup
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.run_number == 1 &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout only approved public metadata and scripts, no persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Pre-download security contracts (35 tests, no packages, no network)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_metadata_gate.py' -v
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_acquisition_LOCKED.py' -v
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_one_shot.py' -v
+
+      - name: Validate free CPU runner memory and disk capacity before downloading
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/qwen3_17b_metadata_gate.py \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --output qwen3_17b_metadata_gate_receipt.json
+
+      - name: Download pinned public 11-file model once and compute SHA-256; NO inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/qwen3_17b_acquisition_ONE_SHOT.py \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --receipt qwen3_17b_acquisition_sha_only_receipt.json
+
+      - name: Assert no model weights or inference outputs in repository workspace
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name '*.safetensors' -o -name '*.bin' -o -name '*.pt' -o -name '*.pth' \) -print -quit | grep -q .; then
+            echo 'SECURITY_FAILURE_UNEXPECTED_MODEL_BYTES_IN_WORKSPACE'
+            exit 1
+          fi
+          echo 'NO_MODEL_BYTES_IN_WORKSPACE'
+
+      - name: Upload ONLY public SHA-256 JSON metadata; NEVER weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen3-17b-public-one-shot-acquisition-SHA-ONLY
+          path: |
+            qwen3_17b_acquisition_sha_only_receipt.json
+            qwen3_17b_metadata_gate_receipt.json
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 6
