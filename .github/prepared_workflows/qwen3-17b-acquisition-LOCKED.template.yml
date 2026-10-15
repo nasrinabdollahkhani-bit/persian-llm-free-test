@@ -1,6 +1,6 @@
 # PREPARED ONLY / NOT AN ACTIVE GITHUB ACTIONS WORKFLOW.
 # This file intentionally lives outside .github/workflows.
-# Do not activate without independent verification of signed owner authorization.
+# Do not activate until explicit personal-owner chat consent is confirmed and the source changes reviewed.
 # The referenced Python downloader is also hard-locked in its committed source.
 name: Prepared LOCKED Qwen3-1.7B Acquisition Hash Only
 
@@ -35,14 +35,14 @@ jobs:
           set -euo pipefail
           python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_metadata_gate.py' -v
           python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_acquisition_LOCKED.py' -v
-          # The locked test must be reviewed/reworked after formal, private
-          # approval; until then keep the whole template INACTIVE.
+          # These tests apply to the locked state only. After explicit owner
+          # chat approval, update/review the relevant test suite before activation.
 
-      - name: Download only if an independent signed owner gate has been verified and unlocked
+      - name: Download ONLY after explicit owner chat consent and reviewed activation
         shell: bash
         run: |
           set -euo pipefail
-          # Intentionally no workflow input for unsigned owner consent.
+          # No public free-text workflow consent input is necessary.
           # Current Python source always fails closed before any download.
           python3 -B scripts/qwen3_17b_acquisition_PREPARED_LOCKED.py \
             --manifest metadata/qwen3_17b_pinned_manifest.json \
