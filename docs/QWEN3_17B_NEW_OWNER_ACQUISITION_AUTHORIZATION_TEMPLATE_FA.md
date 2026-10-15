@@ -1,6 +1,6 @@
 # MORTEZA_5 — الگوی مجوز مستقل دریافت Qwen3-1.7B
 
-**این فایل فقط الگوی متن است؛ مجوز امضاشده محسوب نمی‌شود.**
+**این فایل فقط الگوی متن است؛ مجوز امضاشده محسوب نمی‌شود. ارسال یا کپی‌کردن این متن بدون انتخاب صریح تأیید و مدرک خصوصی امضا، مجوز دانلود یا اجرا ایجاد نمی‌کند.**
 
 **وضعیت: ACQUISITION NOT_AUTHORIZED / INFERENCE NOT_AUTHORIZED**
 
@@ -28,7 +28,7 @@
 
 - فهرست و Revision: **PREPARED**
 - SHA-256 رسمی دو Shard و Tokenizer: **DOCUMENTED, NOT_DOWNLOADED**
-- گیت حداقل ظرفیت: **CODE_PREPARED, NATIVE_RUNNER_NOT_EXECUTED**
+- گیت حداقل ظرفیت: **PROVISIONAL PASS / REAL RUN VERIFIED — 2026-10-15 / [38715217648](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38715217648)**؛ جاگیری مدل در RAM و اجرای واقعی هنوز تأیید نشده است.
 - بررسی حقوقی مجوز Apache-2.0: **PENDING**
 - دریافت وزن‌ها: **NOT_EXECUTED**
 - اجرای مدل: **NOT_EXECUTED**
