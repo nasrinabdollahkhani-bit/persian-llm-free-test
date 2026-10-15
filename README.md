@@ -22,6 +22,8 @@ The [Authorized Persian Qwen Quality V2 workflow](https://github.com/nasrinabdol
 - Inference runs as `qwen_infer` with fail-closed IPv4/IPv6 outbound restriction at the UID boundary. That is not proof of hypervisor isolation or a physical air gap. No APEX integration, audio, STT, TTS, Windows test or product Source mutation.
 - Only the tiny **public synthetic JSON text report**, environment version list, capacity report and SHA metadata are allowed in a 1-day Artifact. No weights or model runtime uploaded. Temporary bytes are removed at the end.
 
+Independent score rules: [Persian Quality V2 review rubric](docs/FA_QUALITY_V2_INDEPENDENT_REVIEW_RUBRIC.md). Human evaluators compare the first five identical questions against the raw baseline; technical 10/10 is **not** a quality PASS.
+
 ### Single next step, only after reviewing the prepared code
 
 Open [the manual quality-v2 Workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml), click **Run workflow**, choose **main**, set **response_count = 10**, and manually trigger **once**. Share its run URL for independent quality evaluation of all ten raw answers. If any step fails, stop and inspect before further retries. A successful GitHub Job alone does not mean the answers are suitable for use in the dashboard.
