@@ -1,0 +1,215 @@
+# INERT TEMPLATE OUTSIDE .github/workflows; NOT A RUNNABLE ACTION.
+# Owner has NOT approved a corrected retry. Do not activate from this template
+# without new explicit consent, a fresh no-network review and accurate docs.
+name: Corrected Qwen3-1.7B Persian 10 ONE-SHOT Retry R1 (not yet authorized)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen3-17b-synthetic-persian-ten-retry-r1
+  cancel-in-progress: false
+
+jobs:
+  persian10:
+    name: Exactly ten PUBLIC synthetic Persian replies; NO APEX
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.run_number == 1 &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PIP_NO_CACHE_DIR: '1'
+      PYTHONUNBUFFERED: '1'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      CUDA_VISIBLE_DEVICES: ''
+      MODEL_DIR: /tmp/morteza5-qwen17-model
+      PY_VENV: /tmp/morteza5-qwen17-venv
+    steps:
+      - name: Checkout approved public scripts ONLY; do not retain credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run all metadata SHA, locked, one-shot and Persian contracts BEFORE network
+        shell: bash
+        run: |
+          set -euo pipefail
+          for suite in test_qwen3_17b_metadata_gate.py test_qwen3_17b_acquisition_LOCKED.py test_qwen3_17b_one_shot.py test_qwen_farsi_quality_v2.py test_qwen3_17b_farsi10_contracts.py; do
+            python3 -B -m unittest discover -s scripts -p "$suite" -v
+          done
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_farsi10_retry_r1.py' -v
+          echo 'PRE_DOWNLOAD_PYTHON_CONTRACTS_COMPLETED'
+
+      - name: Check standard free Linux x64 runner, CPU, memory and disk
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/runner_preflight.py
+          python3 -B scripts/qwen3_17b_metadata_gate.py \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --output qwen3_17b_inference_capacity_receipt.json
+          python3 - <<'PY'
+          import os,shutil
+          values={}
+          for line in open('/proc/meminfo',encoding='utf-8'):
+              if ':' not in line: continue
+              k,v=line.split(':',1)
+              if k in ('MemAvailable','MemTotal'): values[k]=int(v.strip().split()[0])*1024
+          assert len(os.sched_getaffinity(0)) >= 4
+          assert values.get('MemAvailable',0) >= 10*1024**3
+          assert shutil.disk_usage('/tmp').free >= 15*1024**3
+          print('QWEN17_INFERENCE_PROVISIONAL_CPU_MEMORY_DISK_PREFLIGHT_PASS')
+          PY
+
+      - name: Require outbound isolation controls BEFORE model or runtime downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v sudo
+          command -v iptables
+          command -v ip6tables
+          sudo iptables -L OUTPUT >/dev/null
+          sudo ip6tables -L OUTPUT >/dev/null
+          echo 'IPV4_IPV6_EGRESS_GUARDS_AVAILABLE'
+
+      - name: Install already-tested pinned CPU-only runtime; no GPU
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$PY_VENV"
+          "$PY_VENV/bin/python" -m pip install --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.6.0'
+          "$PY_VENV/bin/python" -m pip install --no-cache-dir \
+            --index-url https://pypi.org/simple \
+            'transformers==4.51.3' 'tokenizers==0.21.1' \
+            'safetensors==0.5.3' 'huggingface-hub==0.30.2'
+          "$PY_VENV/bin/python" -m pip check
+          "$PY_VENV/bin/python" - <<'PY'
+          import torch, transformers, tokenizers, safetensors, huggingface_hub
+          assert torch.__version__.split('+')[0]=='2.6.0'
+          assert torch.version.cuda is None and not torch.cuda.is_available()
+          assert transformers.__version__=='4.51.3'
+          assert tokenizers.__version__=='0.21.1'
+          assert safetensors.__version__=='0.5.3'
+          assert huggingface_hub.__version__=='0.30.2'
+          print('QWEN17_CPU_RUNTIME_VERSION_CHECK_PASS')
+          PY
+          "$PY_VENV/bin/python" -m pip freeze --all > qwen17_runtime_versions.txt
+
+      - name: Reacquire exactly 11 files at pinned SHA256 from successful prior receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$MODEL_DIR"
+          python3 -B scripts/qwen3_17b_stage_verified_inference_RETRY_R1.py \
+            --model-dir "$MODEL_DIR" \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --sha-lock metadata/qwen3_17b_prior_acquisition_11_sha_lock.json \
+            --receipt qwen17_inference_model_sha_receipt.json
+
+      - name: Deny inference user IPv4 and IPv6 outbound; generate ten raw Persian replies
+        shell: bash
+        run: |
+          set -euo pipefail
+          if id qwen17_infer >/dev/null 2>&1; then
+            echo 'DEDICATED_USER_COLLISION'; exit 2
+          fi
+          sudo useradd --system --create-home --user-group --shell /bin/sh qwen17_infer
+          sudo install -d -o qwen17_infer -g qwen17_infer -m 0755 /tmp/morteza5-qwen17-out
+          sudo install -o root -g root -m 0644 \
+            "$GITHUB_WORKSPACE/scripts/qwen3_17b_farsi10_inference.py" /tmp/qwen3_17b_farsi10_inference.py
+          sudo install -o root -g root -m 0644 \
+            "$GITHUB_WORKSPACE/scripts/qwen_farsi_quality_v2.py" /tmp/qwen_farsi_quality_v2.py
+          sudo install -o root -g root -m 0644 \
+            "$GITHUB_WORKSPACE/metadata/qwen3_17b_prior_acquisition_11_sha_lock.json" /tmp/qwen3_17b_sha_lock.json
+          sudo -u qwen17_infer test -r /tmp/qwen3_17b_farsi10_inference.py
+          sudo -u qwen17_infer test -r /tmp/qwen_farsi_quality_v2.py
+          sudo -u qwen17_infer test -r /tmp/qwen3_17b_sha_lock.json
+          chmod 755 "$MODEL_DIR"
+          chmod 644 "$MODEL_DIR"/*
+          infer_uid="$(id -u qwen17_infer)"
+          four_enabled=0
+          six_enabled=0
+          restore_network() {
+            if [ "$six_enabled" -eq 1 ]; then sudo ip6tables -D OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT || true; fi
+            if [ "$four_enabled" -eq 1 ]; then sudo iptables -D OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT || true; fi
+          }
+          trap restore_network EXIT
+          sudo iptables -I OUTPUT 1 -m owner --uid-owner "$infer_uid" -j REJECT
+          four_enabled=1
+          sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$infer_uid" -j REJECT
+          six_enabled=1
+          sudo iptables -C OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT
+          sudo ip6tables -C OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT
+          if sudo -u qwen17_infer curl --location --silent --max-time 3 https://example.com >/dev/null 2>&1; then
+            echo 'BLOCKED_OUTBOUND_FIREWALL_FAILED'; exit 2
+          fi
+          echo 'QWEN17_INFERENCE_UID_EGRESS_BLOCKED_IPV4_IPV6'
+          sudo -u qwen17_infer env \
+            HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_DATASETS_OFFLINE=1 \
+            HF_HUB_DISABLE_TELEMETRY=1 TOKENIZERS_PARALLELISM=false \
+            CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 \
+            timeout --signal=TERM --kill-after=15s 45m \
+            "$PY_VENV/bin/python" -B /tmp/qwen3_17b_farsi10_inference.py \
+              --model-dir "$MODEL_DIR" \
+              --sha-lock /tmp/qwen3_17b_sha_lock.json \
+              --output /tmp/morteza5-qwen17-out/qwen17_farsi10_raw.json
+          cp /tmp/morteza5-qwen17-out/qwen17_farsi10_raw.json qwen17_farsi10_raw.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('qwen17_farsi10_raw.json').read_text(encoding='utf-8'))
+          assert r['actual_count']==10 and len(r['answers'])==10
+          assert r['technical_status']=='TEN_RAW_RESPONSES_GENERATED'
+          assert all(x['raw_model_response'] for x in r['answers'])
+          assert r['model']=='Qwen/Qwen3-1.7B'
+          print('TEN_PUBLIC_PERSIAN_RESPONSES_COMPLETED; HUMAN_QUALITY_REVIEW_PENDING')
+          PY
+
+      - name: Copy any partial public synthetic response receipt after a failure
+        if: failure()
+        shell: bash
+        run: |
+          if test -f /tmp/morteza5-qwen17-out/qwen17_farsi10_raw.json; then
+            cp /tmp/morteza5-qwen17-out/qwen17_farsi10_raw.json qwen17_farsi10_raw.json
+            echo 'SYNTHETIC_PARTIAL_RESPONSES_PRESERVED'
+          fi
+
+      - name: Delete all model weights, environment, temporary responses and scripts
+        if: always()
+        shell: bash
+        run: |
+          rm -rf -- "$MODEL_DIR" "$PY_VENV"
+          sudo rm -rf -- /tmp/morteza5-qwen17-out \
+            /tmp/qwen3_17b_farsi10_inference.py /tmp/qwen_farsi_quality_v2.py \
+            /tmp/qwen3_17b_sha_lock.json
+          echo 'TEMPORARY_QWEN17_MODEL_RUNTIME_REMOVED'
+          if find "$GITHUB_WORKSPACE" -type f \( -name '*.safetensors' -o -name '*.pt' -o -name '*.pth' \) -print -quit | grep -q .; then
+            echo 'MODEL_BYTES_IN_PUBLIC_WORKSPACE_DENIED'; exit 2
+          fi
+          echo 'NO_MODEL_WEIGHTS_IN_REPOSITORY_WORKSPACE'
+
+      - name: Upload ONLY public synthetic raw text, public SHA metadata and version receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-qwen3-17b-fa10-raw-and-sha-only
+          path: |
+            preflight.json
+            qwen3_17b_inference_capacity_receipt.json
+            qwen17_runtime_versions.txt
+            qwen17_inference_model_sha_receipt.json
+            qwen17_farsi10_raw.json
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 6
