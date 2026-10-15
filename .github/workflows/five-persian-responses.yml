@@ -168,7 +168,7 @@ jobs:
               --model-dir "$MODEL_DIR" \
               --output /tmp/morteza5-qwen-output/farsi_quality_v2_responses.json \
               --count "$RESPONSE_COUNT"
-          cp /tmp/morteza5-qwen-output/synthetic_persian_responses.json \
+          cp /tmp/morteza5-qwen-output/farsi_quality_v2_responses.json \
             farsi_quality_v2_responses.json
           python3 - <<'PY'
           import json
