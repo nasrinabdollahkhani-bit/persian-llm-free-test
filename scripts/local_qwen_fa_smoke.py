@@ -30,6 +30,11 @@ PROMPTS = (
     "بدون ساختن عدد یا ادعای دسترسی به داده، فایده مقایسه دو استان را توضیح بده.",
     "سه معیار کوتاه برای ارزیابی کیفیت پاسخ فارسی نام ببر.",
     "اگر پرسش کاربر مبهم باشد، بهترین اقدام چیست؟",
+    "برای بررسی یک گزارش آماری چه پرسش های تکمیلی باید مطرح شود؟",
+    "تفاوت داده معتبر و عدد حدسی را در دو جمله توضیح بده.",
+    "چگونه درباره یک موضوع نامطمئن پاسخ مسئولانه می دهی؟",
+    "چه راهی برای خلاصه کردن یک گزارش طولانی به فارسی پیشنهاد می کنی؟",
+    "برای مقایسه روندها بدون دسترسی به داده واقعی چه احتیاطی لازم است؟",
 )
 
 
@@ -57,7 +62,8 @@ def verify_model_dir(model_dir):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model-dir", type=pathlib.Path, required=True)
-    ap.add_argument("--output", type=pathlib.Path, default=pathlib.Path("five_public_synthetic_responses.json"))
+    ap.add_argument("--output", type=pathlib.Path, default=pathlib.Path("synthetic_persian_responses.json"))
+    ap.add_argument("--count", type=int, choices=range(5, 11), default=5)
     ap.add_argument("--max-new-tokens", type=int, default=80)
     args = ap.parse_args()
 
@@ -84,7 +90,7 @@ def main():
     )
     model.eval()
     answers = []
-    for idx, prompt in enumerate(PROMPTS, 1):
+    for idx, prompt in enumerate(PROMPTS[:args.count], 1):
         messages = [
             {"role": "system", "content": "فقط بر اساس پرسش جواب بده. به اطلاعات بیرونی یا داده سازمانی دسترسی نداری. پاسخ کوتاه و فارسی باشد."},
             {"role": "user", "content": prompt},
@@ -115,6 +121,7 @@ def main():
         "torch": torch.__version__,
         "transformers": transformers.__version__,
         "max_rss_kib_linux": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+        "requested_response_count": args.count,
         "answers": answers,
         "llm_text_smoke": "COMPLETED_WITH_RAW_OUTPUT_NOT_INDEPENDENTLY_AUDITED",
         "stt": "NOT_EXECUTED", "tts": "NOT_EXECUTED", "windows_native": "NOT_EXECUTED",
