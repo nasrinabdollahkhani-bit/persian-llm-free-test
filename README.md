@@ -46,4 +46,17 @@ The test put an intentionally malformed `bad.json` inside the model directory, w
 - **DO NOT CLICK RUN OR RE-RUN** on the original [FA10 one-shot workflow](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml). Its first-run authorization has been consumed; its run_number/attempt guards intentionally reject another run.
 - A distinct, corrected **single-use retry** requires explicit additional personal-project owner approval. Only after that can a new manual workflow with its own first-run guard be activated. The existing 0.6B workflow and its unused retry slots are unrelated.
 
-**Current state:** `SOURCE_TEST_FIX_PREPARED / ZERO_MODEL_INFERENCE / SECOND_RUN_NOT_AUTHORIZED`. No action is required until the owner approves or declines one specifically scoped replacement run.
+### Corrected retry R1 — independently authorized for ONE manual run
+
+On 2026-10-15 the owner of this **personal** project explicitly approved **one corrected Qwen3-1.7B FA10 run on the standard free GitHub CPU runner**, using 10 public synthetic Persian questions and the exact 11 known model SHA-256 values. The original failed workflow **MUST NOT be re-run**.
+
+- [**NEW manual corrected R1 workflow**](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-farsi-inference-retry-r1.yml) — owner actor and main branch only; accepts only **run #1 / attempt #1**.
+- [Scope of the explicit owner's retry approval and activation](docs/QWEN3_17B_FA10_RETRY_R1_OWNER_APPROVAL_AND_ACTIVATION_2026-10-15.md).
+- [Corrected previous faulty fixture and new nonempty-dir regression](scripts/test_qwen3_17b_farsi10_contracts.py). Source security validation unchanged.
+- [Seven specialized corrected-retry tests](scripts/test_qwen3_17b_farsi10_retry_r1.py) include mocked all-11 staging, invalid manifest, dirty model directory and SHA mismatch; no model download during those tests.
+- **67 offline pre-download unit contracts scheduled**: 11 + 10 + 14 + 8 + 17 + 7. Their CI outcomes are **NOT_VERIFIED until the actual R1 run**.
+- Model, prompt profile, public data-only controls, dedicated network-restricted inference UID, temporary-weight cleanup and JSON text-only artifacts remain the same.
+
+**ONLY next action:** Open [the NEW R1 workflow page](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-farsi-inference-retry-r1.yml), choose `main`, click **Run workflow** exactly ONCE. Send the new Run URL for independent verification and analysis of real Persian quality. Do not touch the previous failed workflow. No runtime execution, download, paid runner or APEX integration has been initiated by preparation alone.
+
+**Current state:** `RETRY_R1_OWNER_APPROVED / NEW_MANUAL_WORKFLOW_ACTIVE / REAL_MODEL_INFERENCE_NOT_EXECUTED`. No action is required until the owner approves or declines one specifically scoped replacement run.
