@@ -46,7 +46,15 @@ The test put an intentionally malformed `bad.json` inside the model directory, w
 - **DO NOT CLICK RUN OR RE-RUN** on the original [FA10 one-shot workflow](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml). Its first-run authorization has been consumed; its run_number/attempt guards intentionally reject another run.
 - A distinct, corrected **single-use retry** requires explicit additional personal-project owner approval. Only after that can a new manual workflow with its own first-run guard be activated. The existing 0.6B workflow and its unused retry slots are unrelated.
 
-### Corrected retry R1 — independently authorized for ONE manual run
+### LATEST EVIDENCE — successful real Qwen3-1.7B Persian inference R1; no production acceptance
+
+[Real GitHub Actions Run 38751548673](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38751548673) completed with **SUCCESS**. Independent review of the real [artifact](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38751548673) confirmed **67/67** no-network pre-download contract tests, **11/11** files SHA matched historical acquisition Run 38734778931 (3 independent published hashes, 8 previously recorded SHA), real **10/10 raw Persian responses**, egress limited by dedicated inference UID, cleanup and no model weights in artifacts. The artifact ZIP SHA-256 matched GitHub's published digest.
+
+**[FULL Persian quality/evidence report](docs/QWEN3_17B_FA10_R1_RUN_38751548673_REAL_EVIDENCE_QUALITY_COMPARISON_FA.md)**. The new model shows clear *relative* Persian improvement over Qwen3-0.6B V2, but 7/10 responses hit the 160-token cap and several are incomplete, repetitive or linguistically defective. Avg generation latency was **54.56 sec** per response; peak process RSS **~9.97 GiB** on 4-CPU runner. **No APEX connection, confidential data, Windows Native validation or quality acceptance.**
+
+**DO NOT DISPATCH OR RERUN either original or corrected one-shot inference workflow.** The owner-approved single run has been consumed, the model/runtime files were cleaned. No further testing or expenses are authorized. Current product gate: `RESEARCH_ONLY / PRODUCTION_NO_GO`.
+
+### Historical R1 authorization record — RUN ALREADY COMPLETED (DO NOT DISPATCH)
 
 On 2026-10-15 the owner of this **personal** project explicitly approved **one corrected Qwen3-1.7B FA10 run on the standard free GitHub CPU runner**, using 10 public synthetic Persian questions and the exact 11 known model SHA-256 values. The original failed workflow **MUST NOT be re-run**.
 
@@ -57,6 +65,6 @@ On 2026-10-15 the owner of this **personal** project explicitly approved **one c
 - **67 offline pre-download unit contracts scheduled**: 11 + 10 + 14 + 8 + 17 + 7. Their CI outcomes are **NOT_VERIFIED until the actual R1 run**.
 - Model, prompt profile, public data-only controls, dedicated network-restricted inference UID, temporary-weight cleanup and JSON text-only artifacts remain the same.
 
-**ONLY next action:** Open [the NEW R1 workflow page](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-farsi-inference-retry-r1.yml), choose `main`, click **Run workflow** exactly ONCE. Send the new Run URL for independent verification and analysis of real Persian quality. Do not touch the previous failed workflow. No runtime execution, download, paid runner or APEX integration has been initiated by preparation alone.
+**Historical instruction now SUPERSEDED:** The new R1 workflow was already run successfully as Run 38751548673. **Do not click Run workflow or Re-run.** No new model execution is authorized.
 
-**Current state:** `RETRY_R1_OWNER_APPROVED / NEW_MANUAL_WORKFLOW_ACTIVE / REAL_MODEL_INFERENCE_NOT_EXECUTED`. No action is required until the owner approves or declines one specifically scoped replacement run.
+**Historical state superseded by the SUCCESS evidence above.** No action is required until the owner approves or declines one specifically scoped replacement run.
