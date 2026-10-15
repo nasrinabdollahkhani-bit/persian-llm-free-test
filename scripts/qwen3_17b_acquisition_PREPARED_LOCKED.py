@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Qwen3-1.7B acquisition PREPARATION, HARD LOCKED, 2026-10-15.
 
-NO DOWNLOAD IS POSSIBLE IN THIS COMMITTED VERSION. A separate signed-owner
-authorization must be privately validated and an independently reviewed
-code-change must activate the acquisition gate. This program is NOT a runner
+NO DOWNLOAD IS POSSIBLE IN THIS COMMITTED VERSION. The individual project
+owner must explicitly approve the single public-model download in this chat;
+a separately reviewed code change must then activate the acquisition gate. This program is NOT a runner
 workflow. No model imports, no pip packages, no inference, no private data.
 """
 import argparse
@@ -20,9 +20,9 @@ from datetime import datetime, timezone
 
 from qwen3_17b_metadata_gate import MODEL, REV, FILES, SHA, validate_manifest
 
-# Must remain FALSE until verified signed OWNER acquisition approval AND
-# a separately-reviewed explicit code change. No CLI argument or workflow
-# input may override this immutable-in-source lock.
+# Must remain FALSE until explicit chat approval by the personal project
+# owner AND a separately reviewed code change. No CLI/environment variable
+# or workflow input may override the current source-level lock.
 ACQUISITION_ENABLED = False
 RECEIPT_FILE = "qwen3_17b_acquisition_sha_only_receipt.json"
 MODEL_SHARD_MAX_BYTES = 4 * 1024**3
@@ -59,11 +59,7 @@ def verify_context():
 def assert_acquisition_authorized():
     # This happens before any network or file download.
     if not ACQUISITION_ENABLED:
-        raise RuntimeError("STOP_UNSIGNED_OWNER_ACQUISITION_GATE")
-    # Still require separately authenticated private owner evidence. A string
-    # supplied as a public workflow_dispatch argument is NOT such evidence.
-    if os.environ.get("MORTEZA5_PRIVATE_OWNER_GATE_ATTESTED") != "1":
-        raise RuntimeError("STOP_NO_PRIVATE_OWNER_ATTESTATION")
+        raise RuntimeError("STOP_NO_EXPLICIT_OWNER_CHAT_CONSENT")
 
 
 def download_one(root, entry):
@@ -120,7 +116,7 @@ def run(manifest_path):
         "immutable_revision": REV,
         "run_id": os.environ.get("GITHUB_RUN_ID"),
         "checked_utc": datetime.now(timezone.utc).isoformat(),
-        "signed_owner_acquisition_approval_verified": False,
+        "owner_acquisition_chat_consent": "NOT_VERIFIED_BY_THIS_SCRIPT",
         "model_execution": "NOT_EXECUTED",
         "packages_installed": "NOT_EXECUTED",
         "windows_native": "NOT_EXECUTED",
@@ -136,7 +132,6 @@ def run(manifest_path):
         validate_manifest(manifest)
         verify_context()
         assert_acquisition_authorized()
-        report["signed_owner_acquisition_approval_verified"] = True
         with tempfile.TemporaryDirectory(prefix="qwen17b-public-acquisition-") as temp:
             root = pathlib.Path(temp)
             for entry in manifest["required_files"]:
@@ -148,8 +143,8 @@ def run(manifest_path):
         safe_codes = {
             "UNSAFE_MANIFEST", "UNAUTHORIZED_RUNNER_CONTEXT",
             "NOT_GITHUB_HOSTED_RUNNER", "INSUFFICIENT_TEMP_DISK",
-            "CURL_NOT_FOUND", "STOP_UNSIGNED_OWNER_ACQUISITION_GATE",
-            "STOP_NO_PRIVATE_OWNER_ATTESTATION", "DOWNLOAD_TIMEOUT",
+            "CURL_NOT_FOUND", "STOP_NO_EXPLICIT_OWNER_CHAT_CONSENT",
+            "DOWNLOAD_TIMEOUT",
         }
         code = str(e)
         if code in safe_codes or re.fullmatch(
