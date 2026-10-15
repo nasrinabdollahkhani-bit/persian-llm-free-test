@@ -1,0 +1,87 @@
+{
+  "schema": "morteza5.public.qwen3-1.7b.metadata-only.v1",
+  "purpose": "PLANNING_ONLY_NO_DOWNLOAD_NO_INFERENCE",
+  "model_repo": "Qwen/Qwen3-1.7B",
+  "fixed_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "upstream_commit_url": "https://huggingface.co/Qwen/Qwen3-1.7B/commit/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "license_declared": "apache-2.0",
+  "organization_legal_review": "PENDING",
+  "required_files": [
+    {
+      "name": "LICENSE",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "name": "README.md",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "name": "config.json",
+      "sha256": null,
+      "bytes": 726
+    },
+    {
+      "name": "generation_config.json",
+      "sha256": null,
+      "bytes": 239
+    },
+    {
+      "name": "merges.txt",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "name": "model-00001-of-00002.safetensors",
+      "sha256": "169ad53ec313c3a34b06c0809216e4fc072cce444a5d4ff2b59690d064130ed5",
+      "bytes": 3441185608
+    },
+    {
+      "name": "model-00002-of-00002.safetensors",
+      "sha256": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9",
+      "bytes": 622294200
+    },
+    {
+      "name": "model.safetensors.index.json",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "name": "tokenizer.json",
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "bytes": 11422654
+    },
+    {
+      "name": "tokenizer_config.json",
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "name": "vocab.json",
+      "sha256": null,
+      "bytes": null
+    }
+  ],
+  "published_weight_total_bytes": 4063479808,
+  "capacity_advisory": {
+    "minimum_affinity_cpus": 4,
+    "minimum_total_memory_gib": 14,
+    "minimum_free_disk_gib": 12
+  },
+  "authorization": {
+    "model_acquisition": "NOT_AUTHORIZED_BY_THIS_MANIFEST",
+    "model_inference": "NOT_AUTHORIZED",
+    "model_weight_publication": "FORBIDDEN",
+    "paid_runners": "FORBIDDEN",
+    "org_data": "FORBIDDEN"
+  },
+  "provenance_limitation": "Only two weight shards and tokenizer.json have independent public upstream SHA-256 entries in this preparation. Other file hashes must be recorded and compared at acquisition time after explicit signed owner authorization.",
+  "evidence_urls": [
+    "https://huggingface.co/Qwen/Qwen3-1.7B/tree/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/model-00001-of-00002.safetensors",
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e/model-00002-of-00002.safetensors",
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e/tokenizer.json",
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/model.safetensors.index.json"
+  ]
+}
