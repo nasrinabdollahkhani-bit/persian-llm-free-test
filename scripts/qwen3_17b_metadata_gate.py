@@ -29,7 +29,8 @@ SHA = {
     "tokenizer.json":
         "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
 }
-WEIGHT_SIZE = 4063479808
+INDEX_TENSOR_SIZE = 4063479808
+SHARD_FILE_TOTAL = 4063515592
 NAME = "qwen3_17b_metadata_gate_receipt.json"
 
 
@@ -41,8 +42,10 @@ def validate_manifest(m):
     entries = m.get("required_files", [])
     if len(entries) != len(FILES) or tuple(x.get("name") for x in entries) != FILES:
         raise ValueError("ALLOWLIST_DIFFERENCE")
-    if m.get("published_weight_total_bytes") != WEIGHT_SIZE:
-        raise ValueError("WEIGHT_SIZE_MISMATCH")
+    if m.get("index_reported_tensor_bytes") != INDEX_TENSOR_SIZE:
+        raise ValueError("INDEX_TENSOR_SIZE_MISMATCH")
+    if m.get("published_shards_total_file_bytes") != SHARD_FILE_TOTAL:
+        raise ValueError("SHARD_FILE_TOTAL_MISMATCH")
     weights = 0
     for entry in entries:
         name = entry["name"]
@@ -56,7 +59,7 @@ def validate_manifest(m):
             raise ValueError("UNVERIFIED_SHA_PRETENDED_PUBLISHED")
         if name.endswith(".safetensors"):
             weights += entry.get("bytes", 0)
-    if weights != WEIGHT_SIZE:
+    if weights != SHARD_FILE_TOTAL:
         raise ValueError("SUM_OF_WEIGHT_SHARDS_MISMATCH")
     a = m.get("authorization", {})
     if a.get("model_acquisition") != "NOT_AUTHORIZED_BY_THIS_MANIFEST":
@@ -67,7 +70,8 @@ def validate_manifest(m):
         raise ValueError("BOUNDARY_VIOLATION")
     return {"allowlisted_files": len(FILES),
             "independently_published_sha256_count": len(SHA),
-            "published_weights_bytes": weights,
+            "published_shard_file_bytes": weights,
+            "index_reported_tensor_bytes": INDEX_TENSOR_SIZE,
             "license_declared": m.get("license_declared"),
             "legal_review": m.get("organization_legal_review")}
 
