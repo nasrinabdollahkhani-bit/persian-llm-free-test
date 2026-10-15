@@ -28,22 +28,23 @@ The personal-project owner agreed to **planning and preparation** of `Qwen/Qwen3
 - [Inert workflow template](.github/prepared_workflows/qwen3-17b-acquisition-LOCKED.template.yml) — deliberately **OUTSIDE** `.github/workflows/` and cannot be selected as an active GitHub Actions workflow.
 - [Personal-owner chat consent instructions](docs/QWEN3_17B_NEW_OWNER_ACQUISITION_AUTHORIZATION_TEMPLATE_FA.md) — a clear, scoped reply in this conversation is sufficient for personal public-model download approval; **no paper signature or organizational signoff is required**.
 
-### Next stage — acquisition complete; inference NOT authorized
+### Latest accepted evidence: Qwen3-1.7B acquisition complete
 
-The [one-shot Qwen3-1.7B acquisition](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38734778931) completed successfully on 2026-10-15. The [independent receipt audit](docs/QWEN3_17B_ONE_SHOT_ACQUISITION_RUN_38734778931_AUDIT_FA.md) verified ZIP SHA, CRC, 11 allowlisted files, two published weight-shard digests and the tokenizer digest, and 16/16 receipt checks. GitHub log shows 35/35 pre-download tests and normal temp cleanup. Do **not** re-run this one-time acquisition workflow.
+[Real GitHub one-shot acquisition 38734778931](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38734778931) completed successfully. [Independent audit](docs/QWEN3_17B_ONE_SHOT_ACQUISITION_RUN_38734778931_AUDIT_FA.md): 11/11 public files, 3 official hashes MATCH, eight prior-archive hashes recorded, 35/35 no-model tests and cleanup. **Do not rerun acquisition**.
 
-Qwen3-1.7B has **never been loaded or used for Persian inference**. Its files were deleted from the ephemeral runner, so a future inference run will need to obtain those same publicly pinned files again under a separate explicit personal-project approval. Do not request paper signatures or institutional authorization for this personal synthetic experiment. Nothing here is an APEX product acceptance.
+### CURRENT: owner-approved one-time Persian FA10 experiment — CODE PREPARED, NO MODEL RUN YET
 
-### Current gate — explicit owner approval granted for ONE download, not inference
+On 2026-10-15 the personal-project owner responded **«بله»** to the explicit request to run **Qwen3-1.7B once for ten synthetic Persian responses on a free CPU GitHub Actions runner**. This authorizes the required re-download and hash verification of the same 11 public files **in the single inference run**. It does not authorize TAMIN/APEX access, private data, paid resources, or additional runs.
 
-On **2026-10-15**, the personal-project owner said **«اجازه دانلود می‌دهم»**, in response to the narrowly specified request for one public GitHub Actions free CPU acquisition of exactly 11 pinned Qwen3-1.7B files, SHA-256 validation, temporary cleanup and a public SHA-only receipt. **This is not permission to execute the model or publish weights.** Paper-signature/organizational approval is unnecessary for this personal and entirely public/synthetic trial.
+- [Prepared manual **one-shot FA10 workflow**](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml) — only run #1 attempt #1; public `main` branch, repo-owner actor, standard free `ubuntu-24.04`.
+- [Execution and consent record](docs/QWEN3_17B_FA10_OWNER_CONSENT_AND_EXECUTION_PLAN_2026-10-15.md).
+- [Frozen 11-file digest lock](metadata/qwen3_17b_prior_acquisition_11_sha_lock.json), based on accepted run 38734778931. The model is loaded ONLY after all eleven files have been checked.
+- [Ten-response script](scripts/qwen3_17b_farsi10_inference.py) uses identical 10 public synthetic prompts, few-shot/system and generation settings from the completed Qwen3-0.6B V2 run 38711873242; it publishes raw, unedited text, token count, latency and stop reason for independent Persian semantic scoring.
+- **59 pre-download unit tests** have been authored/scheduled (11 metadata, 10 locked baseline, 14 one-shot acquisition, 8 V2 prompt, 16 new 1.7B contracts). Do not claim CI-PASS until the new workflow actually runs.
+- Source/static review: **21/21 checks PASS**. This is not equivalent to runtime, dependency supply chain, or Windows native validation.
+- CPU inference uses a dedicated non-root user with outgoing IPv4/IPv6 blocked, and offline-only model loading; no proof of genuine enterprise air-gap.
+- Models, pip runtime and temporary user outputs are cleaned after the run; only short SHA metadata, public synthetic raw answers and runtime versions may be uploaded.
 
-- [Owner-authorized ONE-SHOT download Workflow](.github/workflows/qwen3-17b-one-shot-acquisition.yml) — **manual dispatch only**, only run **#1** attempt **#1**, actor/repo/branch and job guarded in both YAML and Python.
-- [Active one-shot acquisition wrapper](scripts/qwen3_17b_acquisition_ONE_SHOT.py) — reuses the pinned 11-file SHA checking routine from the still-locked previous candidate, calls temporary cleanup, reports only hashes.
-- [14 no-network one-shot tests](scripts/test_qwen3_17b_one_shot.py), 11 metadata tests and 10 previous locked-script tests are scheduled **BEFORE downloads**. Count: 35 tests, not claimed CI-PASS until the first actual run.
-- Existing [locked acquisition baseline](scripts/qwen3_17b_acquisition_PREPARED_LOCKED.py) and [inert workflow template](.github/prepared_workflows/qwen3-17b-acquisition-LOCKED.template.yml) remain inactive for historical comparison.
-- The only Artifact paths are small **JSON SHA receipts**, never the model files, tensors, tokenizers, personal data, or inference output. Temp weights are cleaned on normal exit; GitHub's ephemeral runner terminates after the job. No paid runner, no installs, no GPUs, no organization data.
+**Only required owner action now:** open [the FA10 one-shot Workflow page](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-farsi-inference-one-shot.yml), select `main`, and click **Run workflow once**. Send its run URL here for independent checking and honest Persian-quality comparison. Avoid retrying until the first result is reviewed.
 
-**Only user action pending:** open [the one-shot manual workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-one-shot-acquisition.yml), select `main`, press **Run workflow ONCE**, and share its run URL. Do not retry even if it fails; investigate the failure and request new scope/approval before another attempt.
-
-After the actual 11-file acquisition is independently confirmed, the owner may separately approve one **synthetic Persian quality inference experiment**. Until then: Qwen3-1.7B `INFERENCE_NOT_AUTHORIZED`, `APEX_NO_INTEGRATION`, `PRODUCTION_NO_ACCEPTANCE`.
+No Qwen3-1.7B inference has yet happened; no APEX integration, Windows/NTFS certification, private TAMIN data or deployment acceptance.
