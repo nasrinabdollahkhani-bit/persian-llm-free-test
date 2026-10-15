@@ -148,7 +148,8 @@ jobs:
         shell: bash
         run: |
           rm -rf -- "$MODEL_DIR" "$PY_VENV"
-          echo "EPHEMERAL_MODEL_AND_RUNTIME_REMOVED"
+          sudo rm -rf -- /tmp/morteza5-qwen-output
+          echo "EPHEMERAL_MODEL_RUNTIME_AND_TMP_OUTPUT_REMOVED"
 
       - name: Upload text and hashes only, NEVER model weights
         if: always()
