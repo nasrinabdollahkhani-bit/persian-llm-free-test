@@ -1,12 +1,12 @@
-name: Authorized 5-10 Persian Qwen Responses (CPU, Synthetic)
+name: Authorized Persian Qwen Quality V2 (CPU, Synthetic)
 
 on:
   workflow_dispatch:
     inputs:
       response_count:
-        description: 'Synthetic Persian responses per run (5 to 10)'
+        description: 'Public synthetic Persian replies per run (5 to 10); quality-v2 profile'
         required: true
-        default: '5'
+        default: '10'
         type: choice
         options:
           - '5'
@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   five_cpu_responses:
-    name: Generate 5-10 synthetic Persian replies
+    name: Generate 5-10 synthetic Persian replies (quality v2)
     if: >-
       github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
       github.actor == 'nasrinabdollahkhani-bit' &&
@@ -62,6 +62,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Run no-model quality-v2 contract checks before any downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s scripts -p 'test_qwen_farsi_quality_v2.py' -v
 
       - name: Verify temporary free runner resources
         shell: bash
@@ -111,7 +117,7 @@ jobs:
           mkdir -p "$MODEL_DIR"
           python3 -B scripts/stage_verified_qwen_for_five.py "$MODEL_DIR"
 
-      - name: Fail-closed dedicated-user firewall and execute 5 local-only text replies
+      - name: Fail-closed dedicated-user firewall and run quality-v2 synthetic inference
         shell: bash
         run: |
           set -euo pipefail
@@ -125,7 +131,7 @@ jobs:
           fi
           sudo useradd --system --create-home --user-group --shell /bin/sh qwen_infer
           sudo install -d -o qwen_infer -g qwen_infer -m 0755 /tmp/morteza5-qwen-output
-          sudo install -o root -g root -m 0644 "$GITHUB_WORKSPACE/scripts/local_qwen_fa_smoke.py" /tmp/morteza5-qwen-smoke.py
+          sudo install -o root -g root -m 0644 "$GITHUB_WORKSPACE/scripts/qwen_farsi_quality_v2.py" /tmp/morteza5-qwen-smoke.py
           sudo -u qwen_infer test -r /tmp/morteza5-qwen-smoke.py
           echo "DEDICATED_INFERENCE_USER_SCRIPT_READABLE"
           chmod 755 "$MODEL_DIR"
@@ -160,20 +166,19 @@ jobs:
             timeout --signal=TERM --kill-after=15s 20m \
             "$PY_VENV/bin/python" -B /tmp/morteza5-qwen-smoke.py \
               --model-dir "$MODEL_DIR" \
-              --output /tmp/morteza5-qwen-output/synthetic_persian_responses.json \
-              --count "$RESPONSE_COUNT" \
-              --max-new-tokens 80
+              --output /tmp/morteza5-qwen-output/farsi_quality_v2_responses.json \
+              --count "$RESPONSE_COUNT"
           cp /tmp/morteza5-qwen-output/synthetic_persian_responses.json \
-            synthetic_persian_responses.json
+            farsi_quality_v2_responses.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          result = json.loads(Path("synthetic_persian_responses.json").read_text(encoding="utf-8"))
+          result = json.loads(Path("farsi_quality_v2_responses.json").read_text(encoding="utf-8"))
           answers = result.get("answers", [])
           expected = int(__import__("os").environ["RESPONSE_COUNT"])
-          if len(answers) != expected or result.get("requested_response_count") != expected or any(not a.get("raw_model_response", "").strip() for a in answers):
+          if len(answers) != expected or result.get("requested_response_count") != expected or result.get("profile") != "FA_QUALITY_V2_NONTHINKING_SAMPLING" or any(not a.get("raw_model_response", "").strip() for a in answers):
               raise SystemExit("BLOCKED: INCOMPLETE_OR_EMPTY_RESPONSES")
-          print(f"REAL_LOCAL_PERSIAN_RESPONSES: {expected}/{expected}")
+          print(f"REAL_LOCAL_PERSIAN_RESPONSES: {expected}/{expected}; QUALITY_REQUIRES_HUMAN_REVIEW")
           PY
 
       - name: Delete all temporary model and runtime bytes
@@ -188,7 +193,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: public-synthetic-persian-responses-and-receipts
+          name: public-synthetic-persian-quality-v2-and-receipts
           path: |
             preflight.json
             runtime_versions.txt
