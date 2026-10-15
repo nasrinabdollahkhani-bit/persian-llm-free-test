@@ -72,55 +72,64 @@ jobs:
           mkdir -p "$MODEL_DIR"
           python3 -B scripts/stage_verified_qwen_for_five.py "$MODEL_DIR"
 
-      - name: Fail-closed outbound firewall and execute 5 local-only text replies
+      - name: Fail-closed dedicated-user firewall and execute 5 local-only text replies
         shell: bash
-        env:
-          HF_HUB_OFFLINE: '1'
-          TRANSFORMERS_OFFLINE: '1'
-          HF_DATASETS_OFFLINE: '1'
-          HF_HUB_DISABLE_TELEMETRY: '1'
-          TOKENIZERS_PARALLELISM: 'false'
         run: |
           set -euo pipefail
           if ! command -v iptables >/dev/null || ! command -v ip6tables >/dev/null; then
             echo "BLOCKED: LINUX_IPTABLES_FIREWALL_UNAVAILABLE"
             exit 2
           fi
-          user_id="$(id -u)"
+          if id qwen_infer >/dev/null 2>&1; then
+            echo "BLOCKED: DEDICATED_INFERENCE_ID_ALREADY_EXISTS"
+            exit 2
+          fi
+          sudo useradd --system --create-home --user-group --shell /bin/sh qwen_infer
+          sudo install -d -o qwen_infer -g qwen_infer -m 0755 /tmp/morteza5-qwen-output
+          chmod 755 "$MODEL_DIR"
+          chmod 644 "$MODEL_DIR"/*
+          infer_uid="$(id -u qwen_infer)"
           four_enabled=0
           six_enabled=0
           restore_network() {
             if [ "$six_enabled" -eq 1 ]; then
-              sudo ip6tables -D OUTPUT -m owner --uid-owner "$user_id" -j REJECT || true
+              sudo ip6tables -D OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT || true
             fi
             if [ "$four_enabled" -eq 1 ]; then
-              sudo iptables -D OUTPUT -m owner --uid-owner "$user_id" -j REJECT || true
+              sudo iptables -D OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT || true
             fi
           }
           trap restore_network EXIT
-          sudo iptables -I OUTPUT 1 -m owner --uid-owner "$user_id" -j REJECT
+          sudo iptables -I OUTPUT 1 -m owner --uid-owner "$infer_uid" -j REJECT
           four_enabled=1
-          sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$user_id" -j REJECT
+          sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$infer_uid" -j REJECT
           six_enabled=1
-          if curl --location --silent --max-time 3 https://example.com >/dev/null 2>&1; then
-            echo "BLOCKED: NETWORK_EGRESS_STILL_ALLOWED"
+          sudo iptables -C OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT
+          sudo ip6tables -C OUTPUT -m owner --uid-owner "$infer_uid" -j REJECT
+          if sudo -u qwen_infer curl --location --silent --max-time 3 https://example.com >/dev/null 2>&1; then
+            echo "BLOCKED: INFERENCE_USER_NETWORK_EGRESS_STILL_ALLOWED"
             exit 2
           fi
-          echo "MODEL_PROCESS_OUTBOUND_IPV4_IPV6_BLOCKED_FOR_RUNNER_UID"
-          timeout --signal=TERM --kill-after=15s 20m \
-            "$PY_VENV/bin/python" -B scripts/local_qwen_fa_smoke.py \
+          echo "INFERENCE_DEDICATED_UID_IPV4_IPV6_EGRESS_BLOCKED"
+          sudo -u qwen_infer env \
+            HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_DATASETS_OFFLINE=1 \
+            HF_HUB_DISABLE_TELEMETRY=1 TOKENIZERS_PARALLELISM=false \
+            CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 \
+            timeout --signal=TERM --kill-after=15s 20m \
+            "$PY_VENV/bin/python" -B "$GITHUB_WORKSPACE/scripts/local_qwen_fa_smoke.py" \
               --model-dir "$MODEL_DIR" \
-              --output five_public_synthetic_responses.json \
+              --output /tmp/morteza5-qwen-output/five_public_synthetic_responses.json \
               --max-new-tokens 80
-          "$PY_VENV/bin/python" - <<'PY'
+          cp /tmp/morteza5-qwen-output/five_public_synthetic_responses.json \
+            five_public_synthetic_responses.json
+          python3 - <<'PY'
           import json
           from pathlib import Path
-          p = Path('five_public_synthetic_responses.json')
-          result = json.loads(p.read_text(encoding='utf-8'))
-          answers = result.get('answers', [])
-          if len(answers) != 5 or any(not a.get('raw_model_response','').strip() for a in answers):
-              raise SystemExit('BLOCKED: INCOMPLETE_OR_EMPTY_FIVE_RESPONSES')
-          print('REAL_LOCAL_PERSIAN_RESPONSES: 5/5')
+          result = json.loads(Path("five_public_synthetic_responses.json").read_text(encoding="utf-8"))
+          answers = result.get("answers", [])
+          if len(answers) != 5 or any(not a.get("raw_model_response", "").strip() for a in answers):
+              raise SystemExit("BLOCKED: INCOMPLETE_OR_EMPTY_FIVE_RESPONSES")
+          print("REAL_LOCAL_PERSIAN_RESPONSES: 5/5")
           PY
 
       - name: Delete all temporary model and runtime bytes
