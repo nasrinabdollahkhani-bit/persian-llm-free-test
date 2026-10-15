@@ -12,6 +12,7 @@
 | Corrected Qwen3-0.6B text test | [38685295846](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38685295846) | 5/5 synthetic texts generated, Persian quality rejected |
 | Qwen3-0.6B V2 text-quality experiment | [38711873242](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38711873242) | 10/10 texts generated, **Persian quality rejected** |
 | Qwen3-1.7B *metadata-only* preflight | [38715217648](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38715217648) | 11/11 manifest contract tests PASS, provisional capacity PASS, **NO new model downloaded or run** |
+| Qwen3-1.7B one-shot acquisition SHA receipt | [38734778931](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38734778931) | **SUCCESS**, 11/11 public files acquired; 3 official SHA-256 MATCH, 8 locally computed; 35/35 no-model contract tests; weights cleaned, **NO INFERENCE** |
 
 Three original approved Qwen3-0.6B retry slots remain unused. They **DO NOT transfer** to Qwen3-1.7B. Because its Persian quality was poor in two real runs, **do not waste the remaining slots**.
 
@@ -26,6 +27,12 @@ The personal-project owner agreed to **planning and preparation** of `Qwen/Qwen3
 - [Ten prepared no-network lock tests](scripts/test_qwen3_17b_acquisition_LOCKED.py) — code present; no model test or new download authorized. They are NOT described as CI-passed until actually run.
 - [Inert workflow template](.github/prepared_workflows/qwen3-17b-acquisition-LOCKED.template.yml) — deliberately **OUTSIDE** `.github/workflows/` and cannot be selected as an active GitHub Actions workflow.
 - [Personal-owner chat consent instructions](docs/QWEN3_17B_NEW_OWNER_ACQUISITION_AUTHORIZATION_TEMPLATE_FA.md) — a clear, scoped reply in this conversation is sufficient for personal public-model download approval; **no paper signature or organizational signoff is required**.
+
+### Next stage — acquisition complete; inference NOT authorized
+
+The [one-shot Qwen3-1.7B acquisition](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38734778931) completed successfully on 2026-10-15. The [independent receipt audit](docs/QWEN3_17B_ONE_SHOT_ACQUISITION_RUN_38734778931_AUDIT_FA.md) verified ZIP SHA, CRC, 11 allowlisted files, two published weight-shard digests and the tokenizer digest, and 16/16 receipt checks. GitHub log shows 35/35 pre-download tests and normal temp cleanup. Do **not** re-run this one-time acquisition workflow.
+
+Qwen3-1.7B has **never been loaded or used for Persian inference**. Its files were deleted from the ephemeral runner, so a future inference run will need to obtain those same publicly pinned files again under a separate explicit personal-project approval. Do not request paper signatures or institutional authorization for this personal synthetic experiment. Nothing here is an APEX product acceptance.
 
 ### Current gate — explicit owner approval granted for ONE download, not inference
 
