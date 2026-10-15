@@ -1,7 +1,20 @@
-name: Authorized Five Persian Qwen Responses (CPU, Synthetic)
+name: Authorized 5-10 Persian Qwen Responses (CPU, Synthetic)
 
 on:
   workflow_dispatch:
+    inputs:
+      response_count:
+        description: 'Synthetic Persian responses per run (5 to 10)'
+        required: true
+        default: '5'
+        type: choice
+        options:
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+          - '9'
+          - '10'
 
 permissions:
   contents: read
@@ -12,7 +25,7 @@ concurrency:
 
 jobs:
   five_cpu_responses:
-    name: Generate exactly 5 synthetic Persian replies
+    name: Generate 5-10 synthetic Persian replies
     if: >-
       github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
       github.actor == 'nasrinabdollahkhani-bit' &&
@@ -29,7 +42,22 @@ jobs:
       CUDA_VISIBLE_DEVICES: ''
       MODEL_DIR: /tmp/morteza5-qwen-staged
       PY_VENV: /tmp/morteza5-qwen-runtime
+      RESPONSE_COUNT: ${{ inputs.response_count }}
     steps:
+      - name: Enforce owner authorization for at most 5 new manual retries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          n = int(os.environ['GITHUB_RUN_NUMBER'])
+          attempt = int(os.environ['GITHUB_RUN_ATTEMPT'])
+          count = int(os.environ['RESPONSE_COUNT'])
+          if not (2 <= n <= 6 and attempt == 1 and 5 <= count <= 10):
+              raise SystemExit('BLOCKED: OWNER_FIVE_RETRIES_OR_COUNT_SCOPE_EXCEEDED')
+          print(f'AUTHORIZED_RETRY_SLOT: {n - 1}/5; SYNTHETIC_RESPONSES_REQUESTED: {count}')
+          PY
+
       - name: Checkout only approved public synthetic scripts
         uses: actions/checkout@v4
         with:
@@ -132,18 +160,20 @@ jobs:
             timeout --signal=TERM --kill-after=15s 20m \
             "$PY_VENV/bin/python" -B /tmp/morteza5-qwen-smoke.py \
               --model-dir "$MODEL_DIR" \
-              --output /tmp/morteza5-qwen-output/five_public_synthetic_responses.json \
+              --output /tmp/morteza5-qwen-output/synthetic_persian_responses.json \
+              --count "$RESPONSE_COUNT" \
               --max-new-tokens 80
-          cp /tmp/morteza5-qwen-output/five_public_synthetic_responses.json \
-            five_public_synthetic_responses.json
+          cp /tmp/morteza5-qwen-output/synthetic_persian_responses.json \
+            synthetic_persian_responses.json
           python3 - <<'PY'
           import json
           from pathlib import Path
-          result = json.loads(Path("five_public_synthetic_responses.json").read_text(encoding="utf-8"))
+          result = json.loads(Path("synthetic_persian_responses.json").read_text(encoding="utf-8"))
           answers = result.get("answers", [])
-          if len(answers) != 5 or any(not a.get("raw_model_response", "").strip() for a in answers):
-              raise SystemExit("BLOCKED: INCOMPLETE_OR_EMPTY_FIVE_RESPONSES")
-          print("REAL_LOCAL_PERSIAN_RESPONSES: 5/5")
+          expected = int(__import__("os").environ["RESPONSE_COUNT"])
+          if len(answers) != expected or result.get("requested_response_count") != expected or any(not a.get("raw_model_response", "").strip() for a in answers):
+              raise SystemExit("BLOCKED: INCOMPLETE_OR_EMPTY_RESPONSES")
+          print(f"REAL_LOCAL_PERSIAN_RESPONSES: {expected}/{expected}")
           PY
 
       - name: Delete all temporary model and runtime bytes
@@ -158,12 +188,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: five-public-synthetic-persian-responses-and-receipts
+          name: public-synthetic-persian-responses-and-receipts
           path: |
             preflight.json
             runtime_versions.txt
             five_response_model_stage_receipt.json
-            five_public_synthetic_responses.json
+            synthetic_persian_responses.json
           if-no-files-found: warn
           retention-days: 1
           compression-level: 6
