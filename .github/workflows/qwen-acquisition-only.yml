@@ -1,0 +1,42 @@
+name: Authorized Qwen3-0.6B Acquisition ONLY (NO INFERENCE)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen3-acquisition-only
+  cancel-in-progress: false
+
+jobs:
+  acquire_and_sha256_only:
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout public verification script only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download only 7 allowlisted Qwen files and verify SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/qwen_acquisition_only.py
+
+      - name: Upload JSON receipt only, NEVER model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-acquisition-hashes-only
+          path: qwen_acquisition_receipt.json
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 6
