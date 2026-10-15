@@ -1,0 +1,50 @@
+name: Qwen3-1.7B Metadata Gate ONLY (NO MODEL DOWNLOAD)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qwen3-17b-metadata-only
+  cancel-in-progress: false
+
+jobs:
+  metadata_only:
+    name: Public CPU/RAM/Disk and pinned manifest NO MODEL
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout only public metadata and python standard-library scripts
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run 11 offline manifest and authorization-scope tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B -m unittest discover -s scripts -p 'test_qwen3_17b_metadata_gate.py' -v
+
+      - name: Check pinned revision and capacity WITHOUT downloading model
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/qwen3_17b_metadata_gate.py \
+            --manifest metadata/qwen3_17b_pinned_manifest.json \
+            --output qwen3_17b_metadata_gate_receipt.json
+
+      - name: Upload ONLY small metadata receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen3-17b-metadata-only-receipt
+          path: qwen3_17b_metadata_gate_receipt.json
+          if-no-files-found: warn
+          retention-days: 1
