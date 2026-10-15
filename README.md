@@ -32,19 +32,17 @@ The personal-project owner agreed to **planning and preparation** of `Qwen/Qwen3
 
 [Real GitHub one-shot acquisition 38734778931](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38734778931) completed successfully. [Independent audit](docs/QWEN3_17B_ONE_SHOT_ACQUISITION_RUN_38734778931_AUDIT_FA.md): 11/11 public files, 3 official hashes MATCH, eight prior-archive hashes recorded, 35/35 no-model tests and cleanup. **Do not rerun acquisition**.
 
-### CURRENT: owner-approved one-time Persian FA10 experiment — CODE PREPARED, NO MODEL RUN YET
+### CURRENT — FA10 attempt #1 blocked before downloads; targeted repair prepared
 
-On 2026-10-15 the personal-project owner responded **«بله»** to the explicit request to run **Qwen3-1.7B once for ten synthetic Persian responses on a free CPU GitHub Actions runner**. This authorizes the required re-download and hash verification of the same 11 public files **in the single inference run**. It does not authorize TAMIN/APEX access, private data, paid resources, or additional runs.
+The owner-approved public synthetic Qwen3-1.7B FA10 Run [38741055594](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38741055594) finished **FAILURE** on 2026-10-15. **58 of 59 pre-download tests passed; one test fixture failed, before any model files were downloaded or any inference took place.**
 
-- [Prepared manual **one-shot FA10 workflow**](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml) — only run #1 attempt #1; public `main` branch, repo-owner actor, standard free `ubuntu-24.04`.
-- [Execution and consent record](docs/QWEN3_17B_FA10_OWNER_CONSENT_AND_EXECUTION_PLAN_2026-10-15.md).
-- [Frozen 11-file digest lock](metadata/qwen3_17b_prior_acquisition_11_sha_lock.json), based on accepted run 38734778931. The model is loaded ONLY after all eleven files have been checked.
-- [Ten-response script](scripts/qwen3_17b_farsi10_inference.py) uses identical 10 public synthetic prompts, few-shot/system and generation settings from the completed Qwen3-0.6B V2 run 38711873242; it publishes raw, unedited text, token count, latency and stop reason for independent Persian semantic scoring.
-- **59 pre-download unit tests** have been authored/scheduled (11 metadata, 10 locked baseline, 14 one-shot acquisition, 8 V2 prompt, 16 new 1.7B contracts). Do not claim CI-PASS until the new workflow actually runs.
-- Source/static review: **21/21 checks PASS**. This is not equivalent to runtime, dependency supply chain, or Windows native validation.
-- CPU inference uses a dedicated non-root user with outgoing IPv4/IPv6 blocked, and offline-only model loading; no proof of genuine enterprise air-gap.
-- Models, pip runtime and temporary user outputs are cleaned after the run; only short SHA metadata, public synthetic raw answers and runtime versions may be uploaded.
+The test put an intentionally malformed `bad.json` inside the model directory, which must be empty. The downloader correctly rejected the nonempty directory (`UNSAFE_MODEL_DIR`), but the test incorrectly expected a later invalid-manifest error. The fixture has been fixed by placing `bad.json` in an independent sibling location, and a new regression test explicitly checks that a nonempty model directory remains blocked before network calls. **No security check was weakened.**
 
-**Only required owner action now:** open [the FA10 one-shot Workflow page](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen3-17b-farsi-inference-one-shot.yml), select `main`, and click **Run workflow once**. Send its run URL here for independent checking and honest Persian-quality comparison. Avoid retrying until the first result is reviewed.
+- [Full failure audit, 11-hash cross-check, and repair details](docs/QWEN3_17B_FA10_RUN_38741055594_FAILURE_AUDIT_AND_TARGETED_FIX_FA.md).
+- The SHA-256 lock for **all 11 public model files exactly matches** the genuine earlier acquisition artifact from Run 38734778931; ZIP checksum and CRC passed independent checking.
+- Focused local mock/fixture reproduction: **2/2 passed**. **Full 60-test GitHub suite NOT rerun**.
+- Qwen3-1.7B has generated **zero** real Persian responses. No APEX data, private data, model weights in artifacts, payments, or Windows validation.
+- **DO NOT CLICK RUN OR RE-RUN** on the original [FA10 one-shot workflow](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml). Its first-run authorization has been consumed; its run_number/attempt guards intentionally reject another run.
+- A distinct, corrected **single-use retry** requires explicit additional personal-project owner approval. Only after that can a new manual workflow with its own first-run guard be activated. The existing 0.6B workflow and its unused retry slots are unrelated.
 
-No Qwen3-1.7B inference has yet happened; no APEX integration, Windows/NTFS certification, private TAMIN data or deployment acceptance.
+**Current state:** `SOURCE_TEST_FIX_PREPARED / ZERO_MODEL_INFERENCE / SECOND_RUN_NOT_AUTHORIZED`. No action is required until the owner approves or declines one specifically scoped replacement run.
