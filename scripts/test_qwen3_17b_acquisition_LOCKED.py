@@ -19,13 +19,13 @@ class LockedAcquisitionContracts(unittest.TestCase):
     def test_hard_lock_is_false(self):
         self.assertIs(d.ACQUISITION_ENABLED, False)
 
-    def test_hard_lock_rejects_without_private_attestation(self):
-        with self.assertRaisesRegex(RuntimeError, "STOP_UNSIGNED_OWNER_ACQUISITION_GATE"):
+    def test_hard_lock_rejects_before_chat_approval(self):
+        with self.assertRaisesRegex(RuntimeError, "STOP_NO_EXPLICIT_OWNER_CHAT_CONSENT"):
             d.assert_acquisition_authorized()
 
-    def test_public_input_cannot_unlock_hard_lock(self):
+    def test_environment_cannot_unlock_hard_lock(self):
         with mock.patch.dict(os.environ, {"MORTEZA5_PRIVATE_OWNER_GATE_ATTESTED": "1"}):
-            with self.assertRaisesRegex(RuntimeError, "STOP_UNSIGNED_OWNER_ACQUISITION_GATE"):
+            with self.assertRaisesRegex(RuntimeError, "STOP_NO_EXPLICIT_OWNER_CHAT_CONSENT"):
                 d.assert_acquisition_authorized()
 
     def test_full_run_is_blocked_before_any_download(self):
@@ -33,7 +33,7 @@ class LockedAcquisitionContracts(unittest.TestCase):
             with mock.patch.object(d.subprocess, "run", side_effect=AssertionError("NETWORK CALLED")) as call:
                 report, code = d.run(MANIFEST)
         self.assertEqual(code, 2)
-        self.assertEqual(report["reason_code"], "STOP_UNSIGNED_OWNER_ACQUISITION_GATE")
+        self.assertEqual(report["reason_code"], "STOP_NO_EXPLICIT_OWNER_CHAT_CONSENT")
         self.assertEqual(report["file_digests"], [])
         self.assertEqual(report["model_execution"], "NOT_EXECUTED")
         call.assert_not_called()
