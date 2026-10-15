@@ -40,7 +40,7 @@
     {
       "name": "model-00002-of-00002.safetensors",
       "sha256": "912becff8d60672aa8628ef08c05898d9adf17c2ad4ae3caf99b065622fdeff9",
-      "bytes": 622294200
+      "bytes": 622329984
     },
     {
       "name": "model.safetensors.index.json",
@@ -63,7 +63,6 @@
       "bytes": null
     }
   ],
-  "published_weight_total_bytes": 4063479808,
   "capacity_advisory": {
     "minimum_affinity_cpus": 4,
     "minimum_total_memory_gib": 14,
@@ -82,6 +81,10 @@
     "https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/model-00001-of-00002.safetensors",
     "https://huggingface.co/Qwen/Qwen3-1.7B/blob/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e/model-00002-of-00002.safetensors",
     "https://huggingface.co/Qwen/Qwen3-1.7B/blob/70d244cc86ccca08cf5af4e1e306ecf908b1ad5e/tokenizer.json",
-    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/model.safetensors.index.json"
-  ]
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/model.safetensors.index.json",
+    "https://huggingface.co/Qwen/Qwen3-1.7B/blame/main/model-00002-of-00002.safetensors"
+  ],
+  "index_reported_tensor_bytes": 4063479808,
+  "published_shards_total_file_bytes": 4063515592,
+  "bytes_semantics": "Index total_size is tensor payload bytes; shard file sizes include safetensors headers and are NOT equal to index total_size."
 }
