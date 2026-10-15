@@ -1,34 +1,36 @@
-# Persian LLM Free Test — Public Synthetic-Only Lab
+# Persian LLM — Public Synthetic-Only Free Runner
 
-This public repository uses **standard free GitHub-hosted runners** for limited, generic experiments. It is **not** a private lab, a physically air-gapped system, an APEX/Mother integration, a Windows NTFS security test, or a production acceptance gate. All logs and small receipts may be public. Never add organizational data, proprietary source, secrets, sensitive prompts or private receipts.
+This repository is **PUBLIC** and for limited, synthetic, generic Qwen3-0.6B tests only. **No** organizational data, passwords, private model weights, private code, APEX/Mother sources, microphone or STT/TTS. It is NOT a private lab or physically air-gapped infrastructure. Nothing here establishes a Windows NTFS security PASS, product acceptance, or legal clearance for an organizational deployment.
 
-## Current workflows — manually dispatched only
+## Manual workflows and permissions
 
-**1. Manual Runner Preflight (NO MODEL)** — `.github/workflows/preflight.yml`
+1. [Manual Runner Preflight (NO MODEL)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/preflight.yml) — completed: temporary Linux CPU/RAM/storage only.
+2. [Authorized Qwen3-0.6B Acquisition ONLY (NO INFERENCE)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen-acquisition-only.yml) — completed, run `38678468114`: seven public files retrieved from pinned immutable commit; the weight and tokenizer matched upstream SHA-256. **This is not an inference result.**
+3. [Authorized Five Persian Qwen Responses (CPU, Synthetic)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml) — **prepared, not executed**. Explicit owner approval is limited to one short synthetic text smoke test of five generic Persian prompts, with CPU-only publicly available libraries and no paid hardware.
 
-Measures CPU/RAM/disk capacity only. Previously completed successfully. It does not download models or packages and cannot establish a private lab.
+All three workflows use **workflow_dispatch only** (manual Run workflow), never push triggers. Public standard `ubuntu-24.04` runners only. Do NOT select paid larger runners.
 
-**2. Authorized Qwen3-0.6B Acquisition ONLY (NO INFERENCE)** — `.github/workflows/qwen-acquisition-only.yml`
+### Five-response test security boundary
 
-The owner provided a narrow acquisition authorization for this public repository:
-- exactly seven **public** files in `Qwen/Qwen3-0.6B` pinned at `c1899de289a04d12100db370d81485cdf75e47ca`;
-- files: `LICENSE`, `README.md`, `config.json`, `generation_config.json`, `tokenizer_config.json`, `tokenizer.json`, `model.safetensors`;
-- temporary standard Linux runner, **no extra paid infrastructure**, no Python package installation, no model loading/inference, no other assets, no product data;
-- cross-check received SHA-256 and byte size against upstream-published expected values for `model.safetensors` and `tokenizer.json`;
-- calculate SHA-256 of the other five files obtained at the fixed commit, while marking these as **not independently upstream-SHA-pinned**;
-- store downloaded bytes **only in an ephemeral temporary directory**, removed at job exit; **never** upload or cache the weights;
-- publish only `qwen_acquisition_receipt.json`, a small public metadata-only hash/size receipt with 1-day retention.
+- Exactly `Qwen/Qwen3-0.6B` revision `c1899de289a04d12100db370d81485cdf75e47ca` and the same seven public files as the prior acquisition.
+- `scripts/stage_verified_qwen_for_five.py` compares *all seven received SHA-256 values* with the independent receipt of GitHub run `38678468114`. This receipt provides two upstream-verified SHA values and five independently recorded received-file values; it is not equivalent to seven upstream published checksums.
+- Python CPU environment: `torch==2.6.0` from the official PyTorch CPU index, `transformers==4.51.3`, `tokenizers==0.21.1`, `safetensors==0.5.3`, `huggingface-hub==0.30.2` from PyPI. CPU/no-CUDA verification, `pip check`, and the exact installed dependency versions (including transitive) are recorded.
+- **Limit:** transitive Wheel SHA-256 digests and full legal provenance of every third-party package have not been independently pinned. This is a public synthetic experiment, not a distributable production environment.
+- Only after staged hashes verify does the workflow attempt an IPv4/IPv6 outbound firewall rule for the runner UID. If it cannot set the rules or observes successful outbound access, it stops **without inference**. Library calls are also forced to `local_files_only=True`; this is an isolated *execution step*, not a physical air gap or a guaranteed private host.
+- `scripts/local_qwen_fa_smoke.py` then loads the local CPU model, asks exactly five public/synthetic Persian prompts, and writes the raw generated text, tokens, latency, and observed process memory. No organizational dataset or app data is referenced.
+- Artifacts contain **only** text replies, model SHA metadata, runtime version list, and capacity receipt. **Never upload, cache, commit, or share weights.** Artifacts expire after 1 day. The model directory and virtual environment are deleted before artifact upload. Do not store API keys or sensitive inputs in GitHub.
+- A successful job is evidence only of an experimental CPU-only **text** smoke test, pending independent review; not an APEX or Windows Native acceptance.
 
-This workflow uses only `workflow_dispatch` (no `push` or scheduled trigger) and checks repository, actor and default branch before running. **Creating this file does not start acquisition.**
+### How to start the authorized five-response test
 
-### How to invoke the authorized acquisition stage
+1. Open [the Five Persian Responses workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml).
+2. Click **Run workflow**, select `main`, then **Run workflow** once.
+3. Share only the resulting GitHub Run URL in the original project chat for independent inspection.
 
-Visit [the manual acquisition workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen-acquisition-only.yml), click **Run workflow**, choose `main`, and click **Run workflow**. Afterwards share only the Run link. Failed or blocked downloads must remain FAIL/BLOCKED; do not claim that receipt hashes were verified until checking real run output.
+Do not re-run automatically on failure: report the exact failure reason; fixes require a new explicit technical review. The current repository has no scheduled or push-triggered model execution.
 
-The success criterion is `SHA_VERIFIED_TWO_UPSTREAM_AND_SEVEN_RECEIVED`. No model execution is done or authorized by this workflow.
+### Source and evidence
 
-### Boundaries
+`scripts/runner_preflight.py`: free-runner capacity; `scripts/qwen_acquisition_only.py`: prior acquisition; `scripts/stage_verified_qwen_for_five.py`: verified staging; `scripts/local_qwen_fa_smoke.py`: approved synthetic local inference. External model weights are never committed.
 
-The separate `scripts/local_qwen_fa_smoke.py` is an **untriggered preparation example only**. Running it or adding an inference workflow requires a new, independent explicit authorization. Model and Python runtime execution **remain NOT_AUTHORIZED**. A public runner is not a substitute for authorized independent Windows Native security evidence, and cannot establish organizational deployment readiness.
-
-The hosted runner may fail if upstream transfers are unavailable or GitHub changes free-runner resource limits; failed outcomes should be reported as-is. Public standard runners are documented by GitHub as no-charge for public repositories; do not select larger runners or paid storage/features.
+This activity is separate from the TAMIN G1-A-R8 private Windows Native security gate. That gate remains `NOT_EXECUTED`; no product merge/freeze is implied.
