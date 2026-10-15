@@ -42,6 +42,7 @@ The test put an intentionally malformed `bad.json` inside the model directory, w
 - The SHA-256 lock for **all 11 public model files exactly matches** the genuine earlier acquisition artifact from Run 38734778931; ZIP checksum and CRC passed independent checking.
 - Focused local mock/fixture reproduction: **2/2 passed**. **Full 60-test GitHub suite NOT rerun**.
 - Qwen3-1.7B has generated **zero** real Persian responses. No APEX data, private data, model weights in artifacts, payments, or Windows validation.
+- [Inactive corrected retry template](.github/prepared_workflows/qwen3-17b-farsi-inference-retry-r1.template.yml), [distinct pinned SHA stage](scripts/qwen3_17b_stage_verified_inference_RETRY_R1.py), and [three extra offline tests](scripts/test_qwen3_17b_farsi10_retry_r1.py) are ready **but NOT authorized or activated**. The future retry workflow will run **63 pre-download contract tests**; GitHub has not executed that new suite.
 - **DO NOT CLICK RUN OR RE-RUN** on the original [FA10 one-shot workflow](.github/workflows/qwen3-17b-farsi-inference-one-shot.yml). Its first-run authorization has been consumed; its run_number/attempt guards intentionally reject another run.
 - A distinct, corrected **single-use retry** requires explicit additional personal-project owner approval. Only after that can a new manual workflow with its own first-run guard be activated. The existing 0.6B workflow and its unused retry slots are unrelated.
 
