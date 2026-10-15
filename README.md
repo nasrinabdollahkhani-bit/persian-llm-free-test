@@ -29,3 +29,14 @@ Independent score rules: [Persian Quality V2 review rubric](docs/FA_QUALITY_V2_I
 Open [the manual quality-v2 Workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml), click **Run workflow**, choose **main**, set **response_count = 10**, and manually trigger **once**. Share its run URL for independent quality evaluation of all ten raw answers. If any step fails, stop and inspect before further retries. A successful GitHub Job alone does not mean the answers are suitable for use in the dashboard.
 
 **No purchases, paid GPU, private organizational datasets, auto-trigger, production integration or independent Windows Native execution.**
+
+
+## Next candidate: Qwen3-1.7B — metadata gate ONLY (NO DOWNLOAD)
+
+Owner agreed to **plan** the next larger model candidate after Qwen3-0.6B achieved 10/10 technical outputs but failed Persian semantic quality. This agreement is **not** an independently authenticated, signed acquisition or inference authorization.
+
+- Fixed upstream revision: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`; official model branch remains separate from this fixed immutable revision.
+- The [11-file manifest](metadata/qwen3_17b_pinned_manifest.json) records two weight-shard SHA-256 values, tokenizer SHA-256, exact known weights file sizes, and the distinction between index tensor bytes and physical shard bytes.
+- [Metadata-only runner workflow](.github/workflows/qwen3-17b-metadata-only.yml) is **manual dispatch only**, on a standard `ubuntu-24.04` public runner, with eleven no-download Python stdlib tests and CPU/RAM/disk capacity evidence. **Never downloads model weights or installs inference packages.**
+- [Acquisition signature template in Persian](docs/QWEN3_17B_NEW_OWNER_ACQUISITION_AUTHORIZATION_TEMPLATE_FA.md) documents the separate signed-owner gate. **Do not put names/signatures/identity documents in this public repo.**
+- Both Qwen3-1.7B model acquisition and inference remain **NOT_AUTHORIZED**. Even a passed metadata gate cannot approve model runtime, Windows security, paid infrastructure, actual private/Airgap isolation or APEX integration.
