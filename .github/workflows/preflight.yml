@@ -1,0 +1,35 @@
+name: Manual Runner Preflight (NO MODEL)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-synthetic-runner-preflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Check free Linux capacity only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout public synthetic-only files
+        uses: actions/checkout@v4
+
+      - name: Non-network, non-model preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/runner_preflight.py
+
+      - name: Upload preflight receipt only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-runner-preflight
+          path: preflight.json
+          if-no-files-found: warn
+          retention-days: 1
