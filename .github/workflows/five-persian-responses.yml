@@ -97,6 +97,9 @@ jobs:
           fi
           sudo useradd --system --create-home --user-group --shell /bin/sh qwen_infer
           sudo install -d -o qwen_infer -g qwen_infer -m 0755 /tmp/morteza5-qwen-output
+          sudo install -o root -g root -m 0644 "$GITHUB_WORKSPACE/scripts/local_qwen_fa_smoke.py" /tmp/morteza5-qwen-smoke.py
+          sudo -u qwen_infer test -r /tmp/morteza5-qwen-smoke.py
+          echo "DEDICATED_INFERENCE_USER_SCRIPT_READABLE"
           chmod 755 "$MODEL_DIR"
           chmod 644 "$MODEL_DIR"/*
           infer_uid="$(id -u qwen_infer)"
@@ -127,7 +130,7 @@ jobs:
             HF_HUB_DISABLE_TELEMETRY=1 TOKENIZERS_PARALLELISM=false \
             CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 \
             timeout --signal=TERM --kill-after=15s 20m \
-            "$PY_VENV/bin/python" -B "$GITHUB_WORKSPACE/scripts/local_qwen_fa_smoke.py" \
+            "$PY_VENV/bin/python" -B /tmp/morteza5-qwen-smoke.py \
               --model-dir "$MODEL_DIR" \
               --output /tmp/morteza5-qwen-output/five_public_synthetic_responses.json \
               --max-new-tokens 80
@@ -148,7 +151,7 @@ jobs:
         shell: bash
         run: |
           rm -rf -- "$MODEL_DIR" "$PY_VENV"
-          sudo rm -rf -- /tmp/morteza5-qwen-output
+          sudo rm -rf -- /tmp/morteza5-qwen-output /tmp/morteza5-qwen-smoke.py
           echo "EPHEMERAL_MODEL_RUNTIME_AND_TMP_OUTPUT_REMOVED"
 
       - name: Upload text and hashes only, NEVER model weights
