@@ -1,36 +1,29 @@
-# Persian LLM — Public Synthetic-Only Free Runner
+# Public Synthetic Persian LLM Lab — MORTEZA_5 (not product approval)
 
-This repository is **PUBLIC** and for limited, synthetic, generic Qwen3-0.6B tests only. **No** organizational data, passwords, private model weights, private code, APEX/Mother sources, microphone or STT/TTS. It is NOT a private lab or physically air-gapped infrastructure. Nothing here establishes a Windows NTFS security PASS, product acceptance, or legal clearance for an organizational deployment.
+This GitHub repository is **PUBLIC**. It may contain only public synthetic questions, open model references, program code, and public hash/version/response receipts. **Do not upload internal organization data, APEX/Mother source, personal data, tokens, secrets, private receipts, or model weights.** Hosted GitHub is not a private/air-gapped lab, and none of these tests count as Windows NTFS native-security evidence or organizational approval.
 
-## Manual workflows and permissions
+## Verified earlier evidence
 
-1. [Manual Runner Preflight (NO MODEL)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/preflight.yml) — completed: temporary Linux CPU/RAM/storage only.
-2. [Authorized Qwen3-0.6B Acquisition ONLY (NO INFERENCE)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/qwen-acquisition-only.yml) — completed, run `38678468114`: seven public files retrieved from pinned immutable commit; the weight and tokenizer matched upstream SHA-256. **This is not an inference result.**
-3. [Authorized 5–10 Persian Qwen Responses (CPU, Synthetic)](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml) — **first attempt failed before model execution** in run `38681069464` because the restricted model user could not read the Python smoke script at its workspace path. The targeted Workflow copy-to-`/tmp` repair has been committed but is still **not verified by a successful inference run**. The owner authorizes up to five *new* manual retry runs, with 5–10 generic synthetic Persian responses per run. The first prior failed run does not count toward these five; no more than workflow run numbers **2 through 6**, attempt 1, are allowed. Stop after the first fully successful and independently reviewed run. CPU-only standard free GitHub runner; no paid hardware.
+- [Preflight](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38677772386): temporary standard Linux CPU/RAM/disk capacity PASS.
+- [Qwen3-0.6B acquisition](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38678468114): seven files at revision `c1899de289a04d12100db370d81485cdf75e47ca` downloaded; two published upstream SHA-256 values MATCH; remaining five match the recorded prior acquisition SHA values, not five independently published hashes.
+- [Original five-response text run](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38681069464): FAILED before inference due to Python-script read access as a restricted user; no response produced.
+- [Successful five-response text run](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/runs/38685295846): CPU-only runtime, seven-file SHA verification, restricted-user network rule, generation, and temporary cleanup PASS; **5/5 nonempty raw replies**, but independent quality review found **0/5 fully satisfactory**, so **PERSIAN QUALITY NOT ACCEPTED**.
 
-All three workflows use **workflow_dispatch only** (manual Run workflow), never push triggers. Public standard `ubuntu-24.04` runners only. Do NOT select paid larger runners.
+## Quality V2 — code prepared, NO NEW RUN
 
-### Five-response test security boundary
+The owner authorized up to **five new** manually dispatched quality/retry runs after the first failed inference attempt: workflow run numbers **2 through 6**, run attempt 1, with **5–10 public/synthetic Persian answers each**. The successful `38685295846` is slot **1/5**; at most **four** authorized slots remain, and no repeat execution should be wasted without reviewing the preceding outcome.
 
-- Exactly `Qwen/Qwen3-0.6B` revision `c1899de289a04d12100db370d81485cdf75e47ca` and the same seven public files as the prior acquisition.
-- `scripts/stage_verified_qwen_for_five.py` compares *all seven received SHA-256 values* with the independent receipt of GitHub run `38678468114`. This receipt provides two upstream-verified SHA values and five independently recorded received-file values; it is not equivalent to seven upstream published checksums.
-- Python CPU environment: `torch==2.6.0` from the official PyTorch CPU index, `transformers==4.51.3`, `tokenizers==0.21.1`, `safetensors==0.5.3`, `huggingface-hub==0.30.2` from PyPI. CPU/no-CUDA verification, `pip check`, and the exact installed dependency versions (including transitive) are recorded.
-- **Limit:** transitive Wheel SHA-256 digests and full legal provenance of every third-party package have not been independently pinned. This is a public synthetic experiment, not a distributable production environment.
-- Only after staged hashes verify does the workflow attempt IPv4/IPv6 outbound firewall rules for a dedicated non-privileged inference user (without disrupting the GitHub runner agent). If it cannot use the network controls or observes successful outbound access as that user, it stops **without inference**. Firewall prerequisites are checked before downloading model weights. Library calls are also forced to `local_files_only=True`; this is an isolated *execution step*, not a physical air gap or a guaranteed private host.
-- `scripts/local_qwen_fa_smoke.py` then loads the local CPU model, asks the chosen 5–10 public/synthetic Persian prompts, and writes the raw generated text, tokens, latency, and observed process memory. No organizational dataset or app data is referenced.
-- Artifacts contain **only** text replies, model SHA metadata, runtime version list, and capacity receipt. **Never upload, cache, commit, or share weights.** Artifacts expire after 1 day. The model directory and virtual environment are deleted before artifact upload. Do not store API keys or sensitive inputs in GitHub.
-- A successful job is evidence only of an experimental CPU-only **text** smoke test, pending independent review; not an APEX or Windows Native acceptance.
+The [Authorized Persian Qwen Quality V2 workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml) is **manual only** (`workflow_dispatch`), standard `ubuntu-24.04` runner only, never push/scheduled triggers. New profile:
 
-### How to start the authorized retry test
+- [`scripts/qwen_farsi_quality_v2.py`](scripts/qwen_farsi_quality_v2.py) — ten fixed, generic synthetic Persian questions, with first five **identical to the real baseline run**; clear Persian system message, one synthetic example, `enable_thinking=False`, documented Qwen3 non-thinking sampling parameters (`do_sample=True`, `temperature=0.7`, `top_p=0.8`, `top_k=20`), 160-token ceiling per response, and fixed per-prompt random seeds.
+- Raw model responses are stored **without rewriting**. Each response includes its prompt, generated tokens, elapsed time, stop reason, and transparent, superficial length/language diagnostics. The script must always mark **semantic quality as not assessed and requiring independent human review**. Nonempty text is a technical outcome, NOT language acceptance.
+- [`scripts/test_qwen_farsi_quality_v2.py`](scripts/test_qwen_farsi_quality_v2.py) — eight standard-library-only contract tests (no runtime/model/download), scheduled before package installation. **Until an actual workflow run passes, these tests are only PREPARED and NOT_EXECUTED in CI**.
+- The same seven public model files are re-downloaded from the immutable revision on each new ephemeral runner, with SHA-256 cross-check against the previous public receipt. CPU dependencies remain direct-version pinned; transitive Wheel hashes are not independently proven.
+- Inference runs as `qwen_infer` with fail-closed IPv4/IPv6 outbound restriction at the UID boundary. That is not proof of hypervisor isolation or a physical air gap. No APEX integration, audio, STT, TTS, Windows test or product Source mutation.
+- Only the tiny **public synthetic JSON text report**, environment version list, capacity report and SHA metadata are allowed in a 1-day Artifact. No weights or model runtime uploaded. Temporary bytes are removed at the end.
 
-1. Open [the Five Persian Responses workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml).
-2. Click **Run workflow**, select `main`, choose **5** to **10** for `response_count` (start with **5**), then **Run workflow** once.
-3. Share only the resulting GitHub Run URL in the original project chat for independent inspection.
+### Single next step, only after reviewing the prepared code
 
-Do not automatically re-run on failure: report and inspect the exact reason before using the next authorized slot. The authorization covers at most five *new* manual runs in this same workflow (run numbers 2–6; no re-run of older snapshots); no additional owner approval is needed within that narrow scope, but an engineer must review any failures before retry. The current repository has no scheduled or push-triggered model execution.
+Open [the manual quality-v2 Workflow](https://github.com/nasrinabdollahkhani-bit/persian-llm-free-test/actions/workflows/five-persian-responses.yml), click **Run workflow**, choose **main**, set **response_count = 10**, and manually trigger **once**. Share its run URL for independent quality evaluation of all ten raw answers. If any step fails, stop and inspect before further retries. A successful GitHub Job alone does not mean the answers are suitable for use in the dashboard.
 
-### Source and evidence
-
-`scripts/runner_preflight.py`: free-runner capacity; `scripts/qwen_acquisition_only.py`: prior acquisition; `scripts/stage_verified_qwen_for_five.py`: verified staging; `scripts/local_qwen_fa_smoke.py`: approved synthetic local inference. External model weights are never committed.
-
-This activity is separate from the TAMIN G1-A-R8 private Windows Native security gate. That gate remains `NOT_EXECUTED`; no product merge/freeze is implied.
+**No purchases, paid GPU, private organizational datasets, auto-trigger, production integration or independent Windows Native execution.**
