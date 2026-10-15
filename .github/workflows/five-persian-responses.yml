@@ -1,0 +1,145 @@
+name: Authorized Five Persian Qwen Responses (CPU, Synthetic)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: synthetic-qwen-five-responses
+  cancel-in-progress: false
+
+jobs:
+  five_cpu_responses:
+    name: Generate exactly 5 synthetic Persian replies
+    if: >-
+      github.repository == 'nasrinabdollahkhani-bit/persian-llm-free-test' &&
+      github.actor == 'nasrinabdollahkhani-bit' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PIP_NO_CACHE_DIR: '1'
+      PYTHONUNBUFFERED: '1'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      CUDA_VISIBLE_DEVICES: ''
+      MODEL_DIR: /tmp/morteza5-qwen-staged
+      PY_VENV: /tmp/morteza5-qwen-runtime
+    steps:
+      - name: Checkout only approved public synthetic scripts
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify temporary free runner resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/runner_preflight.py
+
+      - name: Install version-pinned CPU runtime (no CUDA)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$PY_VENV"
+          "$PY_VENV/bin/python" -m pip install --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu 'torch==2.6.0'
+          "$PY_VENV/bin/python" -m pip install --no-cache-dir \
+            --index-url https://pypi.org/simple \
+            'transformers==4.51.3' 'tokenizers==0.21.1' \
+            'safetensors==0.5.3' 'huggingface-hub==0.30.2'
+          "$PY_VENV/bin/python" -m pip check
+          "$PY_VENV/bin/python" - <<'PY'
+          import torch, transformers, tokenizers, safetensors, huggingface_hub
+          assert torch.__version__.split('+')[0] == '2.6.0'
+          assert torch.version.cuda is None and not torch.cuda.is_available()
+          assert transformers.__version__ == '4.51.3'
+          assert tokenizers.__version__ == '0.21.1'
+          assert safetensors.__version__ == '0.5.3'
+          assert huggingface_hub.__version__ == '0.30.2'
+          print('CPU_RUNTIME_DIRECT_VERSION_CHECK_PASS')
+          PY
+          "$PY_VENV/bin/python" -m pip freeze --all > runtime_versions.txt
+
+      - name: Re-acquire exactly 7 pinned public files and verify all 7 SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$MODEL_DIR"
+          python3 -B scripts/stage_verified_qwen_for_five.py "$MODEL_DIR"
+
+      - name: Fail-closed outbound firewall and execute 5 local-only text replies
+        shell: bash
+        env:
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+          HF_DATASETS_OFFLINE: '1'
+          HF_HUB_DISABLE_TELEMETRY: '1'
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          set -euo pipefail
+          if ! command -v iptables >/dev/null || ! command -v ip6tables >/dev/null; then
+            echo "BLOCKED: LINUX_IPTABLES_FIREWALL_UNAVAILABLE"
+            exit 2
+          fi
+          user_id="$(id -u)"
+          four_enabled=0
+          six_enabled=0
+          restore_network() {
+            if [ "$six_enabled" -eq 1 ]; then
+              sudo ip6tables -D OUTPUT -m owner --uid-owner "$user_id" -j REJECT || true
+            fi
+            if [ "$four_enabled" -eq 1 ]; then
+              sudo iptables -D OUTPUT -m owner --uid-owner "$user_id" -j REJECT || true
+            fi
+          }
+          trap restore_network EXIT
+          sudo iptables -I OUTPUT 1 -m owner --uid-owner "$user_id" -j REJECT
+          four_enabled=1
+          sudo ip6tables -I OUTPUT 1 -m owner --uid-owner "$user_id" -j REJECT
+          six_enabled=1
+          if curl --location --silent --max-time 3 https://example.com >/dev/null 2>&1; then
+            echo "BLOCKED: NETWORK_EGRESS_STILL_ALLOWED"
+            exit 2
+          fi
+          echo "MODEL_PROCESS_OUTBOUND_IPV4_IPV6_BLOCKED_FOR_RUNNER_UID"
+          timeout --signal=TERM --kill-after=15s 20m \
+            "$PY_VENV/bin/python" -B scripts/local_qwen_fa_smoke.py \
+              --model-dir "$MODEL_DIR" \
+              --output five_public_synthetic_responses.json \
+              --max-new-tokens 80
+          "$PY_VENV/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('five_public_synthetic_responses.json')
+          result = json.loads(p.read_text(encoding='utf-8'))
+          answers = result.get('answers', [])
+          if len(answers) != 5 or any(not a.get('raw_model_response','').strip() for a in answers):
+              raise SystemExit('BLOCKED: INCOMPLETE_OR_EMPTY_FIVE_RESPONSES')
+          print('REAL_LOCAL_PERSIAN_RESPONSES: 5/5')
+          PY
+
+      - name: Delete all temporary model and runtime bytes
+        if: always()
+        shell: bash
+        run: |
+          rm -rf -- "$MODEL_DIR" "$PY_VENV"
+          echo "EPHEMERAL_MODEL_AND_RUNTIME_REMOVED"
+
+      - name: Upload text and hashes only, NEVER model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: five-public-synthetic-persian-responses-and-receipts
+          path: |
+            preflight.json
+            runtime_versions.txt
+            five_response_model_stage_receipt.json
+            five_public_synthetic_responses.json
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 6
