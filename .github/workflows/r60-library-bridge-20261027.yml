@@ -9,13 +9,13 @@ permissions:
 jobs:
   transfer:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 55
     steps:
       - name: Fetch encrypted payload and verify checksum
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --location --retry 3 --retry-delay 5 --connect-timeout 20 --max-time 900 --output r60.enc 'https://2522873c0f3fd0.lhr.life/enc/34dd960753a21bfc222a26a0904033598be2de5fd98c9078'
+          curl --fail --location --retry 2 --retry-delay 4 --connect-timeout 20 --max-time 2800 --output r60.enc 'https://bxkqj-213-156-152-84.free.pinggy.net/enc/34dd960753a21bfc222a26a0904033598be2de5fd98c9078'
           echo '2ccfd03fd61df86286a0180dfc0a0e12b316e653b7d948bcb28976163baa043e  r60.enc' | sha256sum --check -
       - name: Temporarily store encrypted artifact
         uses: actions/upload-artifact@v4
