@@ -1,0 +1,18 @@
+name: Library transfer compatibility check
+on:
+  push:
+    paths:
+      - '.github/workflows/r60-file-bridge-compat-20261027.yml'
+permissions:
+  contents: read
+jobs:
+  compat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: printf 'R60-LIBRARY-BRIDGE-TEST' > probe.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r60-small-probe
+          path: probe.txt
+          retention-days: 1
