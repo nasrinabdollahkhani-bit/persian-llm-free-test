@@ -1,0 +1,26 @@
+name: R60 encrypted Library transfer
+on:
+  push:
+    paths:
+      - '.github/workflows/r60-library-bridge-20261027.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Fetch encrypted payload and verify checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 5 --connect-timeout 20 --max-time 900 --output r60.enc 'https://2522873c0f3fd0.lhr.life/enc/34dd960753a21bfc222a26a0904033598be2de5fd98c9078'
+          echo '2ccfd03fd61df86286a0180dfc0a0e12b316e653b7d948bcb28976163baa043e  r60.enc' | sha256sum --check -
+      - name: Temporarily store encrypted artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r60-encrypted-transfer
+          path: r60.enc
+          retention-days: 1
+          compression-level: 0
